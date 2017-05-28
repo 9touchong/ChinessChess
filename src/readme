@@ -1,0 +1,4 @@
+本项目是一个象棋游戏
+BLL目录：业务逻辑层（Business Logic Layer）
+DAL目录：数据访问层（Data access layer）
+UIL目录：界面层（User Interface layer）
