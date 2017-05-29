@@ -13,11 +13,14 @@ class Main extends egret.DisplayObject {
 	//构造函数
 	public constructor() {
 		super();
-		var urlLoader: egret3d.URLLoader = new egret3d.URLLoader("resource/assets/background.jpg");
-		urlLoader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.createGameScene, this);
+		var queueLoader: egret3d.QueueLoader = new egret3d.QueueLoader();
+		queueLoader.load("resource/default.res.json");
+		queueLoader.load("resource/assets/background.jpg");
+		queueLoader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.createGameScene, this);
 		//this.createGameScene();
 	}
-	private createGameScene(e: egret3d.LoaderEvent3D) {		
+	private createGameScene(e: egret3d.LoaderEvent3D) {
+		var the_queueLoader: egret3d.QueueLoader = e.target;
 		//创建Canvas对象。
 		this._egret3DCanvas = new egret3d.Egret3DCanvas();
 		//Canvas的起始坐标，页面左上角为起始坐标(0,0)。
@@ -28,13 +31,9 @@ class Main extends egret.DisplayObject {
 		this._egret3DCanvas.height = window.innerHeight;
 		//创建View3D对象,页面左上角为起始坐标(0,0)
 		this._view3D = new egret3d.View3D(0, 0, window.innerWidth, window.innerHeight);
-		//显示背景-失败
-		//let sky0 = this.createBitmapByName("bkg_jpg");
-		//this.addChild(sky0);
-		//let sky = RES.getRes("bkg_jpg");
-		//console.log("haha1");
-		let sky : egret3d.ImageTexture = e.data;
-		this._view3D.backImage = sky;
+		//显示背景
+		let sky : egret3d.ImageTexture = the_queueLoader.getAsset("resource/assets/background.jpg");
+		//this._view3D.backImage = sky;
 		//当前对象对视位置,其参数依次为:
 		//@param pos 对象的位置
 		//@param target 目标的位置
@@ -50,7 +49,7 @@ class Main extends egret.DisplayObject {
 		//创建立方体，放置于场景内(0,0,0)位置
 		//创建一个默认的贴图材质球
 		//var mat_cube: egret3d.TextureMaterial = new egret3d.TextureMaterial();
-		var mat_cube: egret3d.TextureMaterial =new egret3d.TextureMaterial(); 
+		var mat_cube: egret3d.TextureMaterial =new egret3d.TextureMaterial(sky); 
 		//使用内置cube数据构造出一个默认参数cube
 		var geometery_Cube: egret3d.CubeGeometry = new egret3d.CubeGeometry();
 		//通过材质球和geometery数据创建一个mesh对象
