@@ -63,7 +63,7 @@ class Main extends egret.DisplayObject {
 		cube2.z+=100;
 		this._view3D.addChild3D(cube2);
 		cube2.enablePick = true;
-		cube2.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.OnPickClick, this);
+		cube2.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickchessman, this);
 		///创建面片，放置于场景内(0,0,0)位置
 		///创建一个默认的贴图材质球
 		var mat_Plane: egret3d.TextureMaterial = new egret3d.TextureMaterial();
@@ -71,7 +71,10 @@ class Main extends egret.DisplayObject {
 		var geometery_Plane: egret3d.PlaneGeometry = new egret3d.PlaneGeometry();
 		//通过材质球和geometery数据创建一个mesh对象
 		var plane = new egret3d.Mesh(geometery_Plane, mat_Plane);
-		plane.addEventListener(egret3d.MouseEvent3D.MOUSE_CLICK,this.clickBoard,this);
+		plane.visible = false;
+		plane.enablePick = true;
+		plane.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickBoard, this);
+		plane.addEventListener(egret3d.MouseEvent3D.MOUSE_OVER,this.mouseoverboard,this);
 		//将mesh节点添加到View3D内
 		this._view3D.addChild3D(plane);
 		///设置默认值-1
@@ -126,7 +129,7 @@ class Main extends egret.DisplayObject {
 	}
 	//自定义鼠标事件
 	///点选棋子
-	public OnPickClick(e: egret3d.Event3D){
+	public clickchessman(e: egret3d.Event3D){
         ///pick的世界坐标
         var pos = e.target.globalPosition;
         ///这里我们将信息输出
@@ -135,5 +138,9 @@ class Main extends egret.DisplayObject {
 	///点击棋盘
 	public clickBoard(e: egret3d.Event3D){
 		console.log ("clicked the chess board");
+	}
+	///掠过
+	public mouseoverboard(e: egret3d.Event3D){
+		console.log("over board");//不行
 	}
 }
