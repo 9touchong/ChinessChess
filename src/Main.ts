@@ -56,14 +56,14 @@ class Main extends egret.DisplayObject {
 		var geometery_Cube: egret3d.CubeGeometry = new egret3d.CubeGeometry();
 		//通过材质球和geometery数据创建一个mesh对象
 		var cube = new egret3d.Mesh(geometery_Cube, mat_cube);
-		var cube2 = new egret3d.Mesh(new egret3d.CubeGeometry(),new egret3d.TextureMaterial());
+		var cube2 = new Piece();
 		//将mesh节点添加到View3D内
 		this._view3D.addChild3D(cube);
 		cube2.x+=100;
 		cube2.z+=100;
 		this._view3D.addChild3D(cube2);
-		cube2.enablePick = true;
-		cube2.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickpiece, this);
+		//cube2.enablePick = true;
+		//cube2.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickpiece, this);
 		///创建面片，放置于场景内(0,0,0)位置
 		///创建一个默认的贴图材质球
 		var mat_Plane: egret3d.TextureMaterial = new egret3d.TextureMaterial();
@@ -127,7 +127,7 @@ class Main extends egret.DisplayObject {
 				break;
 		}
 	}
-	//自定义鼠标事件
+	/*/自定义鼠标事件
 	///点选棋子
 	public clickpiece(e: egret3d.Event3D){
         ///pick的世界坐标
@@ -142,5 +142,5 @@ class Main extends egret.DisplayObject {
 		console.log ("clicked the chess board","material",e.target.material);
 		//this.active_piece.x += 50;
 		//this.active_piece.y += 50;
-	}
+	}*/
 }
