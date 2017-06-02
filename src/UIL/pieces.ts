@@ -1,6 +1,8 @@
 class Piece extends egret3d.Mesh{
-    public constructor() {
+    public constructor(x:number,z:number) {
         super(new egret3d.CubeGeometry(),new egret3d.TextureMaterial());
+        this.x = x;
+        this.z = z;
         this.enablePick = true;
         this.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.onClickPiece, this);
     }

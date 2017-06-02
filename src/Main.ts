@@ -48,35 +48,33 @@ class Main extends egret.DisplayObject {
 		this._camera = this._view3D.camera3D;
 		//启动_egret3DCanvas
 		this._egret3DCanvas.start();
-		//创建立方体，放置于场景内(0,0,0)位置
-		//创建一个默认的贴图材质球
-		//var mat_cube: egret3d.TextureMaterial = new egret3d.TextureMaterial();
-		var mat_cube: egret3d.TextureMaterial =new egret3d.TextureMaterial(sky); 
-		//使用内置cube数据构造出一个默认参数cube
-		var geometery_Cube: egret3d.CubeGeometry = new egret3d.CubeGeometry();
-		//通过材质球和geometery数据创建一个mesh对象
-		var cube = new egret3d.Mesh(geometery_Cube, mat_cube);
-		var cube2 = new Piece();
+		
+		//在场景中生成并添加物体了
+		//棋盘
+		var Bed = new ChessBoardBed();	//棋盘底儿即主体
+		this._view3D.addChild3D(Bed);
+		for (var t_i = 0 ; t_i < Bed.sites_points.length ; t_i++ ){
+			for (var t_j = 0 ; t_j < Bed.sites_points[t_i].length ; t_j++){
+				let t_point = Bed.sites_points[t_i][t_j];
+				let t_site = new ChessBoardSite(t_point[0],t_point[1]);
+				this._view3D.addChild3D(t_site);
+			}
+		}
+		//棋子
+		var Piece1 = new Piece(100,0);
+		var Piece2 = new Piece(-100,0);
+		this._view3D.addChild3D(Piece1);
+		this._view3D.addChild3D(Piece2);
+		//var Site1 = new ChessBoardSite(200,250);
+		//var Site2 = new ChessBoardSite(-200,260);
+		//var Site3 = new ChessBoardSite(180,200);
+		//var Site4 = new ChessBoardSite(-200,-200);
 		//将mesh节点添加到View3D内
-		this._view3D.addChild3D(cube);
-		cube2.x+=100;
-		cube2.z+=100;
-		this._view3D.addChild3D(cube2);
-		//cube2.enablePick = true;
-		//cube2.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickpiece, this);
-		///创建面片，放置于场景内(0,0,0)位置
-		///创建一个默认的贴图材质球
-		var mat_Plane: egret3d.TextureMaterial = new egret3d.TextureMaterial();
-		//使用内置Plane数据构造出一个默认参数Plane
-		var geometery_Plane: egret3d.PlaneGeometry = new egret3d.PlaneGeometry();
-		//通过材质球和geometery数据创建一个mesh对象
-		//var plane = new egret3d.Mesh(geometery_Plane, mat_Plane);
-		//plane.visible = false;
-		//plane.enablePick = true;
-		//plane.addEventListener(egret3d.PickEvent3D.PICK_CLICK, this.clickBoard, this);
-		var plane = new ChessBoard();
-		//将mesh节点添加到View3D内
-		this._view3D.addChild3D(plane);
+		//this._view3D.addChild3D(Site1);
+		//this._view3D.addChild3D(ChessBoardSite2);
+		//this._view3D.addChild3D(ChessBoardSite3);
+		//this._view3D.addChild3D(ChessBoardSite4);
+
 		///设置默认值-1
 		this._key = -1;
 		///注册事件，持有对象为_egret3DCanvas，每帧触发该注册方法，需要依次写入事件标识符，注册方法和注册对象。
@@ -86,9 +84,6 @@ class Main extends egret.DisplayObject {
 		///注册鼠标回弹事件
 		egret3d.Input.addEventListener(egret3d.KeyEvent3D.KEY_UP, this.OnKeyUp, this);
 		console.log("Hello World,Hello Egret3D");
-		console.log("cube",cube.x,cube.y,cube.z);
-		console.log("cube1",cube2.x,cube2.y,cube2.z);
-		console.log("plane",plane.x,plane.y,plane.z);
 	}
 	//鼠标回弹事件
 	public OnKeyUp(e: egret3d.KeyEvent3D) {
@@ -127,20 +122,4 @@ class Main extends egret.DisplayObject {
 				break;
 		}
 	}
-	/*/自定义鼠标事件
-	///点选棋子
-	public clickpiece(e: egret3d.Event3D){
-        ///pick的世界坐标
-        var pos = e.target.globalPosition;
-        ///这里我们将信息输出
-		console.log("you have picked me","pos:" + pos.x + "," + pos.y + "," + pos.z);
-		//console.log("you have picked me position",e.target.position,"parent",e.target.parent)
-		//this.active_piece = e.target;
-	}
-	///点击棋盘
-	public clickBoard(e: egret3d.Event3D){
-		console.log ("clicked the chess board","material",e.target.material);
-		//this.active_piece.x += 50;
-		//this.active_piece.y += 50;
-	}*/
 }
