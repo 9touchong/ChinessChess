@@ -2,3 +2,4 @@
 BLL目录：业务逻辑层（Business Logic Layer）
 DAL目录：数据访问层（Data access layer）
 UIL目录：界面层（User Interface layer）
+3d模型引入问题无法解决，放弃3d，改用2d继续

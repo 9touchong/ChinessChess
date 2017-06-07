@@ -19,7 +19,7 @@ class Main extends egret.DisplayObject {
 		queueLoader.load("resource/default.res.json");
 		queueLoader.load("resource/assets/background.jpg");
 		queueLoader.load("resource/assets/wood_Material.jpg");
-		//queueLoader.load("resource/assets/ttt/Teapot001.esm");
+		queueLoader.load("resource/assets/ttt/Teapot001.esm");
 		queueLoader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.createGameScene, this);
 		//this.createGameScene();
 	}
