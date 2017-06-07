@@ -16,19 +16,11 @@
       "name": "game"
     },
     {
-      "name": "res"
-    },
-    {
-      "name": "tween"
-    },
-    {
-      "name": "socket"
-    },
-    {
-      "name": "dragonBones"
-    },
-    {
       "name": "egret3d"
+    },
+    {
+      "name": "resourcemanager",
+      "path": "resourcemanager"
     }
   ]
 }

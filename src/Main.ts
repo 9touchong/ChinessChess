@@ -18,6 +18,8 @@ class Main extends egret.DisplayObject {
 		var queueLoader: egret3d.QueueLoader = new egret3d.QueueLoader();
 		queueLoader.load("resource/default.res.json");
 		queueLoader.load("resource/assets/background.jpg");
+		queueLoader.load("resource/assets/wood_Material.jpg");
+		//queueLoader.load("resource/assets/ttt/Teapot001.esm");
 		queueLoader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, this.createGameScene, this);
 		//this.createGameScene();
 	}
@@ -33,9 +35,11 @@ class Main extends egret.DisplayObject {
 		this._egret3DCanvas.height = window.innerHeight;
 		//创建View3D对象,页面左上角为起始坐标(0,0)
 		this._view3D = new egret3d.View3D(0, 0, window.innerWidth, window.innerHeight);
+		//材质定义
+		var mat_sky : egret3d.ImageTexture = the_queueLoader.getAsset("resource/assets/background.jpg");
+		let mat_wood : egret3d.ImageTexture = the_queueLoader.getAsset("resource/assets/wood_Material.jpg");
 		//显示背景
-		let sky : egret3d.ImageTexture = the_queueLoader.getAsset("resource/assets/background.jpg");
-		//this._view3D.backImage = sky;
+		//this._view3D.backImage = mat_sky;
 		//当前对象对视位置,其参数依次为:
 		//@param pos 对象的位置
 		//@param target 目标的位置
@@ -61,10 +65,13 @@ class Main extends egret.DisplayObject {
 			}
 		}
 		//棋子
-		var Piece1 = new Piece(100,0);
-		var Piece2 = new Piece(-100,0);
+		var Piece1 = new Piece(100,0,mat_wood);
+		var Piece2 = new Piece(-100,0,mat_wood);
+		//var Piecet : egret3d.Geometry = the_queueLoader.getAsset("resource/assets/Text02.esm");
 		this._view3D.addChild3D(Piece1);
 		this._view3D.addChild3D(Piece2);
+		//console.log("haha",Piecet);
+		//this._view3D.addChild3D(Piecet);
 		//var Site1 = new ChessBoardSite(200,250);
 		//var Site2 = new ChessBoardSite(-200,260);
 		//var Site3 = new ChessBoardSite(180,200);
