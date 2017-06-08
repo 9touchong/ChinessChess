@@ -25,8 +25,8 @@
 	<script egret="lib" src="libs/modules/egret/egret.js" src-release="libs/modules/egret/egret.min.js"></script>
 	<script egret="lib" src="libs/modules/egret/egret.web.js" src-release="libs/modules/egret/egret.web.min.js"></script>
 	<script egret="lib" src="libs/modules/game/game.js" src-release="libs/modules/game/game.min.js"></script>
-	<script egret="lib" src="libs/modules/egret3d/egret3d.js" src-release="libs/modules/egret3d/egret3d.min.js"></script>
-	<script egret="lib" src="resourcemanager/resourcemanager.js" src-release="resourcemanager/resourcemanager.min.js"></script>
+	<script egret="lib" src="libs/modules/res/res.js" src-release="libs/modules/res/res.min.js"></script>
+	<script egret="lib" src="libs/modules/tween/tween.js" src-release="libs/modules/tween/tween.min.js"></script>
 	<!--modules_files_end-->
 
     <!--这个标签为不通过egret提供的第三方库的方式使用的 javascript 文件，请将这些文件放在libs下，但不要放在modules下面。-->
@@ -37,10 +37,7 @@
     <!--这个标签会被替换为项目中所有的 javascript 文件。删除 game_files 标签后，项目文件加载列表将不会变化，请谨慎操作！-->
     <!--game_files_start-->
 	<script egret="game" src="bin-debug/Main.js"></script>
-	<script egret="game" src="bin-debug/UIL/chessboardbed.js"></script>
-	<script egret="game" src="bin-debug/UIL/chessboardsite.js"></script>
 	<script egret="game" src="bin-debug/UIL/LoadingUI.js"></script>
-	<script egret="game" src="bin-debug/UIL/pieces.js"></script>
 	<!--game_files_end-->
 </head>
 <body>
@@ -48,14 +45,14 @@
     <div style="margin: auto;width: 100%;height: 100%;" class="egret-player"
          data-entry-class="Main"
          data-orientation="auto"
-         data-scale-mode="noScale"
+         data-scale-mode="showAll"
          data-frame-rate="30"
-         data-content-width="1000"
-         data-content-height="980"
+         data-content-width="888"
+         data-content-height="888"
          data-show-paint-rect="false"
          data-multi-fingered="2"
          data-show-fps="false" data-show-log="false"
-         data-log-filter="" data-show-fps-style="x:0,y:0,size:30,textColor:0x00c200,bgAlpha:0.9">
+         data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
     </div>
     <script>
         /**
@@ -65,10 +62,7 @@
          * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
          * }
          **/
-        //egret.runEgret({renderMode:"webgl", audioType:0});
-        setTimeout( function () {
-            egret.runEgret({renderMode:"webgl", audioType:0});
-        },300);
+        egret.runEgret({renderMode:"webgl", audioType:0});
     </script>
 </body>
 </html>

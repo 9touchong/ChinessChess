@@ -1,10 +1,11 @@
 {
-	"resources": [
+	"groups": [
 		{
-			"name": "background_jpg",
-			"type": "image",
-			"url": "assets/background.jpg"
-		},
+			"keys": "bg_jpg,egret_icon_png,description_json,background_jpg,wood_Material_jpg",
+			"name": "preload"
+		}
+	],
+	"resources": [
 		{
 			"name": "bg_jpg",
 			"type": "image",
@@ -16,20 +17,19 @@
 			"url": "assets/egret_icon.png"
 		},
 		{
-			"name": "wood_Material_jpg",
-			"type": "image",
-			"url": "assets/wood_Material.jpg"
-		},
-		{
 			"name": "description_json",
 			"type": "json",
 			"url": "config/description.json"
-		}
-	],
-	"groups": [
+		},
 		{
-			"name": "preload",
-			"keys": "background_jpg,bg_jpg,egret_icon_png,wood_Material_jpg,description_json"
+			"name": "background_jpg",
+			"type": "image",
+			"url": "assets/background.jpg"
+		},
+		{
+			"name": "wood_Material_jpg",
+			"type": "image",
+			"url": "assets/wood_Material.jpg"
 		}
 	]
 }

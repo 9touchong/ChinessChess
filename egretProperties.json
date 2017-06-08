@@ -16,11 +16,10 @@
       "name": "game"
     },
     {
-      "name": "egret3d"
+      "name": "res"
     },
     {
-      "name": "resourcemanager",
-      "path": "resourcemanager"
+      "name": "tween"
     }
   ]
 }
