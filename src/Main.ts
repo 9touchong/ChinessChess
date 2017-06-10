@@ -95,8 +95,13 @@ class Main extends egret.DisplayObjectContainer {
         let board = new ChessBoardBed();
         this.addChild(board);
         board.gene_sites_points();
-        let site1 = new ChessBoardSite(100,100);
-        this.addChild(site1);
+        for (var t_i = 0 ; t_i < board.sites_points.length ; t_i++){
+            for (var t_j = 0 ; t_j < board.sites_points.length ; t_j++){
+                let t_point = board.sites_points[t_i][t_j];
+                let t_site = new ChessBoardSite(t_point[0],t_point[1]);
+                this.addChild(t_site);
+            }
+        }
         let che = new Piece("c","r",50,50);
         this.addChild(che); 
     }

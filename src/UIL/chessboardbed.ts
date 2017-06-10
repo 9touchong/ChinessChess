@@ -13,8 +13,8 @@ class ChessBoardBed extends egret.Bitmap{
          * 一些诸如spaceX之类的变量因为只在这里用一次就不设为类属性了
          */
         this.place_board();
-        var startX = this.x+10;
-        var startY = this.x+10;
+        var startX = this.x + 22;
+        var startY = this.y + 23;
         var spaceX:number = 57;
         var spaceY:number = 57;
         this.sites_points = new Array();
