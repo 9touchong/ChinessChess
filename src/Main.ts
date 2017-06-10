@@ -92,12 +92,13 @@ class Main extends egret.DisplayObjectContainer {
      * Create a game scene
      */
     private createGameScene() {
-        let sky = this.createBitmapByName("bg_jpg");
-        this.addChild(sky);
-        let stageW = this.stage.stageWidth;
-        let stageH = this.stage.stageHeight;
-        sky.width = stageW;
-        sky.height = stageH;
+        let board = new ChessBoardBed();
+        this.addChild(board);
+        board.gene_sites_points();
+        let site1 = new ChessBoardSite(100,100);
+        this.addChild(site1);
+        let che = new Piece("c","r",50,50);
+        this.addChild(che); 
     }
 
     /**
