@@ -92,6 +92,9 @@ class Main extends egret.DisplayObjectContainer {
      * Create a game scene
      */
     private createGameScene() {
+        var the_game = new GamePlay(this);
+        the_game.startone();
+        /*
         var board = new ChessBoardBed();
         this.addChild(board);
         board.place_sites();
@@ -115,9 +118,7 @@ class Main extends egret.DisplayObjectContainer {
                 this.addChild(t_piece);
             }
             }
-        }
-        //let che = new Piece("c","r",50,50);
-        //this.addChild(che); 
+        }*/
     }
 
     /**
