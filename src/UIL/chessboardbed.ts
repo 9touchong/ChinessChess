@@ -14,7 +14,7 @@ class ChessBoardBed extends egret.Bitmap{
         for (var t_i = 0 ; t_i < this.sites_points.length ; t_i++){
             for (var t_j = 0 ; t_j < this.sites_points[t_i].length ; t_j++){
                 let t_point = this.sites_points[t_i][t_j];
-                let t_site = new ChessBoardSite(t_point[0],t_point[1]);
+                let t_site = new ChessBoardSite(t_point[0],t_point[1],t_i,t_j);
                 this.parent.addChild(t_site);
             }
         }

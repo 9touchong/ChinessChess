@@ -1,6 +1,10 @@
 class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
-    public constructor(s_x:number,s_y:number){
+    private m_x : number;
+    private m_y : number;
+    public constructor(s_x:number,s_y:number,m_x:number,m_y:number){
         super();
+        this.m_x = m_x;
+        this.m_y = m_y;
         this.graphics.beginFill( 0xff0000, 1);
         this.graphics.drawCircle(0,0,16);   //半径不宜过大
         this.graphics.endFill();
