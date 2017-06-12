@@ -92,33 +92,9 @@ class Main extends egret.DisplayObjectContainer {
      * Create a game scene
      */
     private createGameScene() {
-        var the_game = new GamePlay(this);
-        the_game.startone();
-        /*
-        var board = new ChessBoardBed();
-        this.addChild(board);
-        board.place_sites();
-        console.log (board.sites_points);
-        var std_initMap = [
-            [["c","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["c","b"]],
-            [["m","r"],         ,["p","r"],         ,         ,         ,         ,["p","b"],         ,["m","b"]],
-            [["x","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["x","b"]],
-            [["s","r"],         ,         ,         ,         ,         ,         ,         ,         ,["s","b"]],
-            [["j","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["j","b"]],
-            [["s","r"],         ,         ,         ,         ,         ,         ,         ,         ,["s","b"]],
-            [["x","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["x","b"]],
-            [["m","r"],         ,["p","r"],         ,         ,         ,         ,["p","b"],         ,["m","b"]],
-            [["c","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["c","b"]]
-        ];//注意这数组，看起来就像是反了一样
-        for (var t_i  = 0 ; t_i < std_initMap.length ; t_i++){
-            for (var t_j = 0 ; t_j < std_initMap[t_i].length ; t_j++){
-            if (std_initMap[t_i][t_j]){
-                //console.log(t_i,t_j);
-                let t_piece = new Piece(std_initMap[t_i][t_j][0],std_initMap[t_i][t_j][1],board.sites_points[t_i][t_j][0],board.sites_points[t_i][t_j][1]);
-                this.addChild(t_piece);
-            }
-            }
-        }*/
+        var the_game_logic = new LogicPlay();
+        var the_game_show = new ShowPlay(this,the_game_logic);
+        the_game_show.startone();
     }
 
     /**

@@ -6,7 +6,7 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         this.graphics.endFill();
         this.x = s_x;
         this.y = s_y;
-        this.alpha = 0.8;
+        this.alpha = 0.3;
         this.touchEnabled = true;
         this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
     }
