@@ -10,7 +10,6 @@ class ShowPlay extends egret.DisplayObject{
         super();
         this.master = the_master;
         this.logic = the_logic;
-        this.addEventListener(CheInpEvt.ADDED,this.tra_CheInp,this);
     }
     public startone(){  //开一局
         //棋盘和棋盘位点生成
@@ -27,9 +26,9 @@ class ShowPlay extends egret.DisplayObject{
                 }
             }
         }
-        
+        this.master.addEventListener(CheInpEvt.DATE,this.tra_CheInp,this.master);
     }
     public tra_CheInp(evt:CheInpEvt){
-        console.log("得到了某child的邀请！" );
+        console.log("得到了某child的邀请！在",evt._year,"and",evt._day );
     }
 }
