@@ -20,11 +20,16 @@ class Piece extends egret.Bitmap {
 		this.anchorOffsetY = this.height/2;
 		this.x = p_x;
 		this.y = p_y;
+		this.touchEnabled = true;
+		this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
 	}
 	public move(m_x,m_y,p_x,p_y){
 		this.m_x = m_x;
 		this.m_y = m_y;
 		this.x = p_x;
 		this.y = p_y;
+	}
+	private ontap(evt:egret.TouchEvent){
+		console.log("you have click a piece");
 	}
 }

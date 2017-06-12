@@ -1,13 +1,16 @@
-class ShowPlay{
+class ShowPlay extends egret.DisplayObject{
     private master; //因为这里用不了parent，就将调用它的主人或叫宿主引进来
-    private logic;
+    private logic;  //配套的逻辑系统
+    protected active_piece: Piece;    //当前活跃棋子，即被拿起来的那个
     public constructor(the_master,the_logic){
         /**
          *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
          *the_logic 配套的逻辑程序
          */
+        super();
         this.master = the_master;
         this.logic = the_logic;
+        this.addEventListener(CheInpEvt.ADDED,this.tra_CheInp,this);
     }
     public startone(){  //开一局
         //棋盘和棋盘位点生成
@@ -24,5 +27,9 @@ class ShowPlay{
                 }
             }
         }
+        
+    }
+    public tra_CheInp(evt:CheInpEvt){
+        console.log("得到了某child的邀请！" );
     }
 }

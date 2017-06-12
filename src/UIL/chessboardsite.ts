@@ -13,8 +13,16 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         this.alpha = 0.3;
         this.touchEnabled = true;
         this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
+        this.addEventListener(CheInpEvt.DATE,this.tra_CheInp,this);
     }
     private ontap(evt:egret.TouchEvent){
-        console.log("you have tap a ChessBoardSite");
+        console.log("哈哈you have tap a ChessBoardSite");
+        var CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.DATE,true);
+        CheInput_Event._year = 1010;
+        this.dispatchEvent(CheInput_Event);
+        console.log("haha",CheInput_Event);
+    }
+    public tra_CheInp(evt:CheInpEvt){
+        console.log("得到了的邀请009！" );
     }
 }

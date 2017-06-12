@@ -8,7 +8,7 @@ class Main extends egret.DisplayObjectContainer {
     /**
      * 一些自定义的全局变量
      */
-    protected active_piece: Piece;    //当前活跃棋子，即被拿起来的那个
+    //protected active_piece: Piece;    //当前活跃棋子，即被拿起来的那个
 
     public constructor() {
         super();
