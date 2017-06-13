@@ -15,9 +15,10 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
     }
     private ontap(evt:egret.TouchEvent){
-        console.log("哈哈you have tap a ChessBoardSite");
-        var CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.DATE);
-        CheInput_Event._year = 1010;
+        console.log("you have tap a ChessBoardSite");
+        var CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+        CheInput_Event._moveToX = this.m_x;
+        CheInput_Event._moveToY = this.m_y;
         this.parent.dispatchEvent(CheInput_Event);
     }
 }

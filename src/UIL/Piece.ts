@@ -42,5 +42,8 @@ class Piece extends egret.Bitmap {
 	}
 	private ontap(evt:egret.TouchEvent){
 		console.log("you have click a piece");
+		var CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+		CheInput_Event._pieceID = this.p_id;
+		this.parent.dispatchEvent(CheInput_Event);
 	}
 }
