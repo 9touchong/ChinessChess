@@ -2,7 +2,7 @@ class ShowPlay extends egret.DisplayObject{
     private master; //因为这里用不了parent，就将调用它的主人或叫宿主引进来
     private logic;  //配套的逻辑系统
     protected pieces_set: Object;   //所有棋子的集合
-    protected active_piece: Piece;    //当前活跃棋子，即被拿起来的那个
+    protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
     protected active_faction:string = "r";  //当前应该行动的阵营,r或b
     public constructor(the_master,the_logic){
         /**
@@ -33,12 +33,19 @@ class ShowPlay extends egret.DisplayObject{
                 }
             }
         }
-        console.log(typeof(this.pieces_set),this.pieces_set);
         this.master.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this.master);
         this.master.addEventListener(CheActEvt.Act,this.do_Action,this.logic);
     }
     private tra_CheInp(evt:CheInpEvt){
-        console.log("得到了某child的邀请！在");
+        if (evt._pieceID){
+            console.log("得到一个piece的点击请求");
+        }
+        else if(evt._moveToX && evt._moveToY){
+            console.log("得到一个位点的点击消息");
+        }
+        else{
+            console.log("得到棋盘空白的点击请求")
+        }
     }
     private do_Action(evt:CheActEvt){
 

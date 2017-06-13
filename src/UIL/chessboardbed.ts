@@ -4,6 +4,8 @@ class ChessBoardBed extends egret.Bitmap{
         super();
         let texture: egret.Texture = RES.getRes("board_png");
         this.texture = texture;
+        this.touchEnabled = true;
+        this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
     }
     public place_sites(){
         /**
@@ -42,5 +44,9 @@ class ChessBoardBed extends egret.Bitmap{
     private place_board(){   //安放棋盘到画面中央
         this.x = (this.parent.stage.stageWidth - this.width)/2;
         this.y = (this.parent.stage.stageHeight - this.height)/2;
+    }
+    private ontap(evt:egret.TouchEvent){
+        let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+        this.parent.dispatchEvent(CheInput_Event);
     }
 }

@@ -5,6 +5,7 @@ class CheInpEvt extends egret.Event{
      */
     public static Tap:string = "Tap";
     public _pieceID:string;
+    public _faction:string;
     public _moveing:boolean = false;
     public _moveToX:number;
     public _moveToY:number;

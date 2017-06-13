@@ -40,10 +40,14 @@ class Piece extends egret.Bitmap {
 		this.x = p_x;
 		this.y = p_y;
 	}
+	public kill_self(){
+		this.visible = false;	//这里用父级remove，要考虑悔棋的情况
+	}
 	private ontap(evt:egret.TouchEvent){
-		console.log("you have click a piece");
-		var CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+		//console.log("you have click a piece");
+		let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
 		CheInput_Event._pieceID = this.p_id;
+		CheInput_Event._faction = this.p_faction;
 		this.parent.dispatchEvent(CheInput_Event);
 	}
 }
