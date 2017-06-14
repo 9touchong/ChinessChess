@@ -3,13 +3,18 @@ class ShowPlay extends egret.DisplayObjectContainer{
     protected pieces_set: Object;   //所有棋子的集合
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
     protected active_faction: string;  //当前应该行动的阵营,r或b
-    public constructor(the_logic){
+    public constructor(the_logic?){
         /**
          *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
          *the_logic 配套的逻辑程序
          */
         super();
-        this.logic = the_logic;       
+        if (the_logic){
+            this.bind(the_logic);
+        }   
+    }
+    public bind(the_logic){ //绑定逻辑层程序对象
+        this.logic = the_logic;
     }
     public startone(){  //开一局
         //棋盘和棋盘位点生成
@@ -18,16 +23,16 @@ class ShowPlay extends egret.DisplayObjectContainer{
         board.place_sites();
         //初始化棋子及摆放
         this.pieces_set = {};
-        var initMap = this.logic.Map;
+        var initMap = this.logic.initMap;
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < initMap.length ; t_i++){
             for (var t_j = 0 ; t_j < initMap[t_i].length ; t_j++){
                 if (initMap[t_i][t_j]){
                     let t_piece = new Piece(initMap[t_i][t_j][0],initMap[t_i][t_j][1],board.sites_points[t_i][t_j][0],board.sites_points[t_i][t_j][1],t_i,t_j);
-                    tem_P_id_num += 1;
                     t_piece.set_p_id("p_"+tem_P_id_num);
                     this.addChild(t_piece);
                     this.pieces_set["p_"+tem_P_id_num] = t_piece;
+                    tem_P_id_num += 1;
                 }
             }
         }
@@ -42,6 +47,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
             if (evt._faction == this.active_faction){   //点击“己方”棋子
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
                     this.active_pieceId = null;
+                    this.pieces_set[evt._pieceID].put_down();
                 }else{
                     
                     this.active_pieceId = evt._pieceID;
