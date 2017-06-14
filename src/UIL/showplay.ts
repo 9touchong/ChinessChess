@@ -3,7 +3,7 @@ class ShowPlay extends egret.DisplayObject{
     private logic;  //配套的逻辑系统
     protected pieces_set: Object;   //所有棋子的集合
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
-    protected active_faction:string = "r";  //当前应该行动的阵营,r或b
+    protected active_faction: string;  //当前应该行动的阵营,r或b
     public constructor(the_master,the_logic){
         /**
          *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
@@ -11,7 +11,7 @@ class ShowPlay extends egret.DisplayObject{
          */
         super();
         this.master = the_master;
-        this.logic = the_logic;
+        this.logic = the_logic;       
     }
     public startone(){  //开一局
         //棋盘和棋盘位点生成
@@ -33,17 +33,29 @@ class ShowPlay extends egret.DisplayObject{
                 }
             }
         }
+        this.active_faction = "r";
         this.master.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this.master);
         this.master.addEventListener(CheActEvt.Act,this.do_Action,this.logic);
+        console.log("zhe za hui shi ",this.active_faction);
     }
     private tra_CheInp(evt:CheInpEvt){
-        if (evt._pieceID){
+        if (evt._pieceID && evt._faction){  //棋子发来的
             console.log("得到一个piece的点击请求");
+            console.log("evt._faction",evt._faction,"this.active_faction",this.active_faction);
+            if (evt._faction == this.active_faction){   //点击“己方”棋子
+                if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
+                    this.active_pieceId = null;
+                }else{
+                    
+                    this.active_pieceId = evt._pieceID;
+                    this.pieces_set[this.active_pieceId].picking_up();
+                }
+            }
         }
-        else if(evt._moveToX && evt._moveToY){
+        else if(evt._moveToX && evt._moveToY){  //位点发来的
             console.log("得到一个位点的点击消息");
         }
-        else{
+        else{   //棋盘空白发来的
             console.log("得到棋盘空白的点击请求")
         }
     }

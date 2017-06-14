@@ -50,4 +50,8 @@ class Piece extends egret.Bitmap {
 		CheInput_Event._faction = this.p_faction;
 		this.parent.dispatchEvent(CheInput_Event);
 	}
+	public picking_up(){	//被拿起的显示效果
+		console.log("start picking_up");
+		egret.Tween.get(this,{loop:true}).to({rotation:360},1000,egret.Ease.backIn);
+	}
 }
