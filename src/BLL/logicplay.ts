@@ -45,7 +45,5 @@ class LogicPlay{
                 }  
             }
         }
-        console.log(this.Map);
-        //console.log(this.pieces_set);
     }
 }

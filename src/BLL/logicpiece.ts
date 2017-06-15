@@ -26,6 +26,7 @@ class LogicPiece extends Object{
         /**
          * 获得当前棋子的所有合法着点
          * 因为这个的实现要一个完整的map，所以放在上一级logicplay中也可以，好像还更合理，以后也可能转移
+         * 参数map是一个9*10基本元素是[role,faction]的二维数组
          */
         let tem_points = [];
         let [Min_x,Min_y,Max_x,Max_y] = [0,0,9,10]; //map的最大范围，横9纵10，这样声明一下主要便于以后修改
