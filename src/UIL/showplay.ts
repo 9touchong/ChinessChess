@@ -38,20 +38,21 @@ class ShowPlay extends egret.DisplayObjectContainer{
         }
         this.active_faction = "r";
         this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
-        this.addEventListener(CheActEvt.Act,this.do_Action,this.logic);
-        console.log("zhe za hui shi ",this.active_faction);
+        this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
     private tra_CheInp(evt:CheInpEvt){
         if (evt._pieceID && evt._faction){  //棋子发来的
-            console.log("得到一个piece的点击请求");
             if (evt._faction == this.active_faction){   //点击“己方”棋子
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
                     this.active_pieceId = null;
                     this.pieces_set[evt._pieceID].put_down();
-                }else{
-                    
+                }else{  //放下当前手中的，拿起另一个
+                    if (this.active_pieceId){
+                        this.pieces_set[this.active_pieceId].put_down();
+                    };
                     this.active_pieceId = evt._pieceID;
                     this.pieces_set[this.active_pieceId].picking_up();
+                    this.logic.dispatchEvent(evt);  //将CheInpEvt转发给逻辑层
                 }
             }
         }

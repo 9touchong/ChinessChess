@@ -1,4 +1,4 @@
-class LogicPlay{
+class LogicPlay extends egret.DisplayObject{
     public initMap = [
         [["c","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["c","b"]],
         [["m","r"],         ,["p","r"],         ,         ,         ,         ,["p","b"],         ,["m","b"]],
@@ -12,9 +12,9 @@ class LogicPlay{
     ];//注意这数组，看起来就像是反了一样,以后再完善时，这里应该从数据层得到，所以现在设为public也是可以的
     private showplay;
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
-    protected pieces_set: Object;   //所有棋子的集合
+    private pieces_set: Object;   //所有棋子的集合
     public constructor(the_showplay?){
-        this.Map = this.initMap;
+        super();
         if (the_showplay){
             this.bind(the_showplay);
         };
@@ -44,6 +44,16 @@ class LogicPlay{
                     this.Map[t_i][t_j] = null;
                 }  
             }
+        }
+        this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
+    }
+    private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
+        if (evt._moveToX && evt._moveToY){  //将要移动或吃子的请求
+        }else{  //仅仅要求一个棋子的可移动范围等
+            console.log(this.pieces_set[evt._pieceID]);
+            var t_piece = this.pieces_set[evt._pieceID];
+            t_piece.effect_update(this.Map,this.pieces_set);
+            console.log("hehrht",t_piece.landing_points[0])
         }
     }
 }

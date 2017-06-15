@@ -98,8 +98,6 @@ class Main extends egret.DisplayObjectContainer {
         this.addChild(the_game_show);
         the_game_show.startone();
         the_game_logic.startone();
-        console.log("the_game_logic",typeof(the_game_logic));
-        console.log("the_game_show",typeof(the_game_show))
     }
 
     /**
