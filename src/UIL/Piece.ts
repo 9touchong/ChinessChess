@@ -51,11 +51,13 @@ class Piece extends egret.Bitmap {
 		this.parent.dispatchEvent(CheInput_Event);
 	}
 	public picking_up(){	//被拿起的显示效果
-		console.log("start picking_up");
+		console.log("piece picking_up");
 		egret.Tween.get(this,{loop:true}).to({scaleX:1.3,scaleY:1.3},1000,egret.Ease.backIn);
 	}
 	public put_down(){	//被放下，停止一切效果
-		console.log("will put_down");
+		console.log("piece put_down");
 		egret.Tween.removeTweens(this);
+		this.scaleX = 1;
+		this.scaleY = 1;
 	}
 }

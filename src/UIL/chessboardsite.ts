@@ -10,7 +10,7 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         this.graphics.endFill();
         this.x = s_x;
         this.y = s_y;
-        this.alpha = 0.3;
+        this.alpha = 0;
         this.touchEnabled = true;
         this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
     }
@@ -20,5 +20,16 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         CheInput_Event._moveToX = this.m_x;
         CheInput_Event._moveToY = this.m_y;
         this.parent.dispatchEvent(CheInput_Event);
+    }
+    public shining(on_off){
+        /**
+         * 位点的闪亮状态
+         * 接收参数on,off
+         */
+        if (on_off == "on"){
+            this.alpha = 0.5;
+        }else{
+            this.alpha = 0;
+        }
     }
 }

@@ -1,4 +1,4 @@
-class LogicPlay extends egret.DisplayObject{
+class LogicPlay extends egret.EventDispatcher{
     public initMap = [
         [["c","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["c","b"]],
         [["m","r"],         ,["p","r"],         ,         ,         ,         ,["p","b"],         ,["m","b"]],
@@ -53,7 +53,11 @@ class LogicPlay extends egret.DisplayObject{
             console.log(this.pieces_set[evt._pieceID]);
             var t_piece = this.pieces_set[evt._pieceID];
             t_piece.effect_update(this.Map,this.pieces_set);
-            console.log("hehrht",t_piece.landing_points[0])
+            console.log("hehrht",t_piece.landing_points);
+            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+            CheAct_Event._actPieceid = t_piece.p_id;
+            CheAct_Event._effectSites = t_piece.landing_points;
+            this.showplay.dispatchEvent(CheAct_Event);
         }
     }
 }

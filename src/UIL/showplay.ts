@@ -1,8 +1,10 @@
 class ShowPlay extends egret.DisplayObjectContainer{
     private logic;  //配套的逻辑系统
     protected pieces_set: Object;   //所有棋子的集合
+    protected sites_tab;    //所有位点的表
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
     protected active_faction: string;  //当前应该行动的阵营,r或b
+    protected shining_points_list;   //当前高亮显示的位点列表，用[m_x,m_y]表示
     public constructor(the_logic?){
         /**
          *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
@@ -20,7 +22,17 @@ class ShowPlay extends egret.DisplayObjectContainer{
         //棋盘和棋盘位点生成
         var board = new ChessBoardBed();
         this.addChild(board);
-        board.place_sites();
+        board.gene_sites_points();
+        this.sites_tab = new Array();
+        for (var t_i = 0 ; t_i < board.sites_points.length ; t_i++){
+            this.sites_tab[t_i] = new Array();
+            for (var t_j = 0 ; t_j < board.sites_points[t_i].length ; t_j++){
+                let t_point = board.sites_points[t_i][t_j];
+                let t_site = new ChessBoardSite(t_point[0],t_point[1],t_i,t_j);
+                this.addChild(t_site);
+                this.sites_tab[t_i][t_j] = t_site;
+            }
+        }
         //初始化棋子及摆放
         this.pieces_set = {};
         var initMap = this.logic.initMap;
@@ -46,6 +58,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
                     this.active_pieceId = null;
                     this.pieces_set[evt._pieceID].put_down();
+                    this.shine_sites("off");
                 }else{  //放下当前手中的，拿起另一个
                     if (this.active_pieceId){
                         this.pieces_set[this.active_pieceId].put_down();
@@ -60,10 +73,45 @@ class ShowPlay extends egret.DisplayObjectContainer{
             console.log("得到一个位点的点击消息");
         }
         else{   //棋盘空白发来的
-            console.log("得到棋盘空白的点击请求")
+            console.log("得到棋盘空白的点击消息");
+            if (this.active_pieceId){
+                this.pieces_set[this.active_pieceId].put_down();
+                this.active_pieceId = null;
+            }
+            this.shine_sites("off");
         }
     }
-    private do_Action(evt:CheActEvt){
-
+    private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
+        console.log("收到逻辑层的消息",evt);
+        if (!evt._actPieceid){  //没有_actPieceid的肯定是不合法的
+            return 0;
+        }
+        if (evt._effectSites){  //接收到要高亮显示的位点
+            this.shine_sites("on",evt._effectSites);
+        }
+    }
+    private shine_sites(on_off:string,sites_list?){
+        if (on_off == "on"){
+            if (!sites_list){
+                return 0;
+            }
+            if (this.shining_points_list){
+                for (let t_point of this.shining_points_list){
+                    this.sites_tab[t_point[0]][t_point[1]].shining("off");
+                }
+            }            
+            this.shining_points_list = sites_list;
+            for (let t_point of this.shining_points_list){
+                this.sites_tab[t_point[0]][t_point[1]].shining("on");
+            }
+        }else{
+            if (this.shining_points_list){
+                for (let t_point of this.shining_points_list){
+                    this.sites_tab[t_point[0]][t_point[1]].shining("off");
+                }
+            }
+            
+            this.shining_points_list = null;
+        }
     }
 }

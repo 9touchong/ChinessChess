@@ -1,4 +1,5 @@
-class LogicPiece extends egret.DisplayObject{
+//class LogicPiece extends egret.DisplayObject{
+class LogicPiece{
     /**
      * 逻辑模式棋子
      * 一些属性的命名考虑了与表现层中的Piece类一致
@@ -8,10 +9,10 @@ class LogicPiece extends egret.DisplayObject{
 	private p_role : string;
 	private p_faction : string;
 	private p_id : string;
-    private landing_points; //棋子下一步可能落点集,包括有敌子在的落点,数组，元素是[m_x,m_y]
+    private landing_points; //棋子下一步可能落点集,包括有敌子在的落点而不包括自身,数组，元素是[m_x,m_y]
     private menace_pieces;  //棋子可以威胁到的敌方子，即下一步可以吃到的子,数组,元素是p_id
     public constructor(p_role:string,p_faction:string,m_x:number,m_y:number,p_id?:string){
-        super();
+        //super();
         if (p_id){
 			this.p_id = p_id;
 		}
@@ -31,24 +32,59 @@ class LogicPiece extends egret.DisplayObject{
          * 参数map和p_set就是LogicPlay中的Map和pieces_set；
          * 不设返回值，只是更新当前棋子的landing_points和menace_pieces属性
          */
-        console.log("start effect_update");
         var tem_points = [];
         var tem_pieces = [];
         var [Min_x,Min_y,Max_x,Max_y] = [0,0,8,9]; //map的最大范围，横9纵10，这样声明一下主要便于以后修改
         switch(this.p_role){
-            case "c":
-                for (let t_x=this.m_x ; t_x>=Min_x ; t_x--){    //左遍历
+            case "c":   //车
+                for (let t_x=this.m_x-1 ; t_x>=Min_x ; t_x--){    //左遍历
                     let t_p_id = map[t_x][this.m_y];
                     if (!t_p_id){  //未遇到棋子
                         tem_points.push([t_x,this.m_y]);
                     }else{  //遇到棋子
-                        if (piece_set[t_p_id].p_faction ==this.p_faction){
+                        if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
                             tem_points.push([t_x,this.m_y]);
                             tem_pieces.push(t_p_id);
                         }
                         break;
                     }
-                }
+                };
+                for (let t_x = this.m_x+1 ; t_x <= Max_x ; t_x++){  //右遍历
+                    let t_p_id = map[t_x][this.m_y];
+                    if (!t_p_id){  //未遇到棋子
+                        tem_points.push([t_x,this.m_y]);
+                    }else{  //遇到棋子
+                        if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                            tem_points.push([t_x,this.m_y]);
+                            tem_pieces.push(t_p_id);
+                        }
+                        break;
+                    }
+                };
+                for (let t_y = this.m_y-1 ; t_y >= Min_y ; t_y--){  //上遍历
+                    let t_p_id = map[this.m_x][t_y];
+                    if (!t_p_id){  //未遇到棋子
+                        tem_points.push([this.m_x,t_y]);
+                    }else{  //遇到棋子
+                        if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                            tem_points.push([this.m_x,t_y]);
+                            tem_pieces.push(t_p_id);
+                        }
+                        break;
+                    }
+                };
+                for (let t_y = this.m_y+1 ; t_y <= Max_y ; t_y++){  //上遍历
+                    let t_p_id = map[this.m_x][t_y];
+                    if (!t_p_id){  //未遇到棋子
+                        tem_points.push([this.m_x,t_y]);
+                    }else{  //遇到棋子
+                        if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                            tem_points.push([this.m_x,t_y]);
+                            tem_pieces.push(t_p_id);
+                        }
+                        break;
+                    }
+                };
                 break;
             default:
                 tem_points = tem_pieces = null;
