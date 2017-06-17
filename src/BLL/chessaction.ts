@@ -10,6 +10,7 @@ class CheActEvt extends egret.Event{
     public _moveToX:number;
     public _moveToY:number;
     public _dyingPieceid:string;    //要杀死的棋子id
+    public _invalid:boolean = false;    //为true时代表无效操作
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }

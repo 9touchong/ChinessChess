@@ -48,7 +48,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                 }
             }
         }
-        this.active_faction = "r";
+        this.active_faction = this.logic.active_faction;
         this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
         this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
@@ -67,10 +67,23 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     this.pieces_set[this.active_pieceId].picking_up();
                     this.logic.dispatchEvent(evt);  //将CheInpEvt转发给逻辑层
                 }
+            }else{  //点击敌方棋子
+                if (this.active_pieceId){
+                    let t_piece = this.pieces_set[evt._pieceID];
+                    evt._moveToX = t_piece.m_x;
+                    evt._moveToY = t_piece.m_y;
+                    evt._pieceID = this.active_pieceId;
+                    this.logic.dispatchEvent(evt);
+                }
+                this.calm_down();
             }
         }
         else if(evt._moveToX && evt._moveToY){  //位点发来的
             console.log("得到一个位点的点击消息");
+            if (this.active_pieceId){   //如果没有棋子，单纯的位点没作用
+                evt._pieceID = this.active_pieceId;
+                this.logic.dispatchEvent(evt);
+            }
         }
         else{   //棋盘空白发来的
             console.log("得到棋盘空白的点击消息");
@@ -83,12 +96,28 @@ class ShowPlay extends egret.DisplayObjectContainer{
     }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
         console.log("收到逻辑层的消息",evt);
-        if (!evt._actPieceid){  //没有_actPieceid的肯定是不合法的
+        if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
+            this.calm_down();
             return 0;
         }
         if (evt._effectSites){  //接收到要高亮显示的位点
             this.shine_sites("on",evt._effectSites);
         }
+        if (evt._moveToX && evt._moveToY){  //接收到有棋子该移动
+            this.movepiece(evt._actPieceid,evt._moveToX,evt._moveToY);
+            this.calm_down();
+        }
+        if (evt._dyingPieceid){ //接受到某棋子被吃掉的命令
+            this.pieces_set[evt._dyingPieceid].kill_self();
+            this.calm_down();
+        }
+    }
+    private calm_down(){    //所有激活状态的元件复归平静
+        if (this.active_pieceId){
+            this.pieces_set[this.active_pieceId].put_down();
+            this.active_pieceId = null;
+        }
+        this.shine_sites("off");
     }
     private shine_sites(on_off:string,sites_list?){
         if (on_off == "on"){
@@ -113,5 +142,9 @@ class ShowPlay extends egret.DisplayObjectContainer{
             
             this.shining_points_list = null;
         }
+    }
+    private movepiece(pieceID: string , m_x: number , m_y: number){
+        let t_site = this.sites_tab[m_x][m_y];
+        this.pieces_set[pieceID].move(m_x,m_y,t_site.x,t_site.y);
     }
 }
