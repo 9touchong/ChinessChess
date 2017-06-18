@@ -15,7 +15,7 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
         this.addEventListener(egret.TouchEvent.TOUCH_TAP,this.ontap,this);
     }
     private ontap(evt:egret.TouchEvent){
-        //console.log("you have tap a ChessBoardSite");
+        console.log("you have tap a ChessBoardSite",this.m_x,this.m_y);
         let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
         CheInput_Event._moveToX = this.m_x;
         CheInput_Event._moveToY = this.m_y;

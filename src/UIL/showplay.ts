@@ -24,9 +24,9 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.addChild(board);
         board.gene_sites_points();
         this.sites_tab = new Array();
-        for (var t_i = 0 ; t_i < board.sites_points.length ; t_i++){
+        for (let t_i = 0 ; t_i < board.sites_points.length ; t_i++){
             this.sites_tab[t_i] = new Array();
-            for (var t_j = 0 ; t_j < board.sites_points[t_i].length ; t_j++){
+            for (let t_j = 0 ; t_j < board.sites_points[t_i].length ; t_j++){
                 let t_point = board.sites_points[t_i][t_j];
                 let t_site = new ChessBoardSite(t_point[0],t_point[1],t_i,t_j);
                 this.addChild(t_site);
@@ -73,12 +73,13 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     evt._moveToX = t_piece.m_x;
                     evt._moveToY = t_piece.m_y;
                     evt._pieceID = this.active_pieceId;
+                    evt._faction = this.pieces_set[evt._pieceID].p_faction;
                     this.logic.dispatchEvent(evt);
                 }
                 this.calm_down();
             }
         }
-        else if(evt._moveToX && evt._moveToY){  //位点发来的
+        else if(evt._moveToX!=null && evt._moveToY!=null){  //位点发来的
             console.log("得到一个位点的点击消息");
             if (this.active_pieceId){   //如果没有棋子，单纯的位点没作用
                 evt._pieceID = this.active_pieceId;
@@ -99,17 +100,27 @@ class ShowPlay extends egret.DisplayObjectContainer{
         if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
             this.calm_down();
             return 0;
-        }
+        };
         if (evt._effectSites){  //接收到要高亮显示的位点
             this.shine_sites("on",evt._effectSites);
-        }
-        if (evt._moveToX && evt._moveToY){  //接收到有棋子该移动
+        };
+        if (evt._moveToX!=null && evt._moveToY!=null){  //接收到有棋子该移动
             this.movepiece(evt._actPieceid,evt._moveToX,evt._moveToY);
             this.calm_down();
-        }
+        };
         if (evt._dyingPieceid){ //接受到某棋子被吃掉的命令
             this.pieces_set[evt._dyingPieceid].kill_self();
             this.calm_down();
+        };
+        if (evt._change_faction){   //接受到换边的命令
+            this.change_faction();
+        };
+    }
+    private change_faction(t_faction?:string){  //切换当前控制阵营
+        if (t_faction){
+            this.active_faction = t_faction;
+        }else{
+            (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
         }
     }
     private calm_down(){    //所有激活状态的元件复归平静

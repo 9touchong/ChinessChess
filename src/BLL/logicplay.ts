@@ -62,7 +62,7 @@ class LogicPlay extends egret.EventDispatcher{
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
             return 0;
         }
-        if (evt._moveToX && evt._moveToY){  //将要移动或吃子的请求
+        if (evt._moveToX!=null && evt._moveToY!=null){  //将要移动或吃子的请求
             let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
             var t_piece = this.pieces_set[evt._pieceID];
             CheAct_Event._actPieceid = t_piece.p_id;
@@ -100,6 +100,8 @@ class LogicPlay extends egret.EventDispatcher{
                         t_piece.move(evt._moveToX,evt._moveToY);
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
                     }
+                    CheAct_Event._change_faction = true;
+                    this.change_faction();
                 }
             }
             this.showplay.dispatchEvent(CheAct_Event);
