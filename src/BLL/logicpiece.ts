@@ -36,6 +36,7 @@ class LogicPiece{
         let tem_points = [];
         let tem_pieces = [];
         let [Min_x,Min_y,Max_x,Max_y] = [0,0,8,9]; //map的最大范围，横9纵10，这样声明一下主要便于以后修改
+        let [r_minY,r_maxY,b_minY,b_maxY] = [0,4,5,9];  //以y坐标区分红黑分界，目的同上
         switch(this.p_role){
             case "c":   //车
                 for (let t_x=this.m_x-1 ; t_x>=Min_x ; t_x--){    //左遍历
@@ -87,7 +88,7 @@ class LogicPiece{
                     }
                 };
                 break;
-            case "m":
+            case "m":   //马
                 let possible_legpoints = [  //马腿可以走的八组位置，每组包括移动或吃子点和別腿点
                     [this.m_x + 1 , this.m_y - 2 , this.m_x , this.m_y - 1],    //前两个代表移动或吃子点，后两个代表別腿点
                     [this.m_x + 2 , this.m_y - 1 , this.m_x + 1 , this.m_y],
@@ -114,9 +115,85 @@ class LogicPiece{
                     }
                 }
                 break;
-            case "p":
+            case "p":   //炮  错了
+                let hill:boolean = false;   //炮要隔山打
+                for (let t_x=this.m_x-1 ; t_x>=Min_x ; t_x--){    //左遍历
+                    let t_p_id = map[t_x][this.m_y];
+                    if (hill){
+                        if (t_p_id){  //遇到棋子
+                            if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                                tem_points.push([t_x,this.m_y]);
+                                tem_pieces.push(t_p_id);
+                            }
+                            break;
+                        }
+                    }else{
+                        if (t_p_id){    //第一次遇到棋子，就是可以架炮的那个山
+                            hill = true;
+                        }else{
+                            tem_points.push([t_x,this.m_y]);
+                        }
+                    }
+                };
+                hill = false;
+                for (let t_x = this.m_x+1 ; t_x <= Max_x ; t_x++){  //右遍历
+                    let t_p_id = map[t_x][this.m_y];
+                    if (hill){
+                        if (t_p_id){  //遇到棋子
+                            if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                                tem_points.push([t_x,this.m_y]);
+                                tem_pieces.push(t_p_id);
+                            }
+                            break;
+                        }
+                    }else{
+                        if (t_p_id){
+                            hill = true;
+                        }else{
+                            tem_points.push([t_x,this.m_y]);
+                        }
+                    }
+                };
+                hill = false;
+                for (let t_y = this.m_y-1 ; t_y >= Min_y ; t_y--){  //上遍历
+                    let t_p_id = map[this.m_x][t_y];
+                    if (hill){   
+                        if (t_p_id){  //遇到棋子
+                            if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                                tem_points.push([this.m_x,t_y]);
+                                tem_pieces.push(t_p_id);
+                            }
+                            break;
+                        }
+                    }else{
+                        if (t_p_id){
+                            hill = true;
+                        }else{
+                            tem_points.push([this.m_x,t_y]);
+                        }
+                    }
+                };
+                hill = false;
+                for (let t_y = this.m_y+1 ; t_y <= Max_y ; t_y++){  //下遍历
+                    let t_p_id = map[this.m_x][t_y];
+                    if (hill){
+                        if (t_p_id){  //遇到棋子
+                            if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                                tem_points.push([this.m_x,t_y]);
+                                tem_pieces.push(t_p_id);
+                            }
+                            break;
+                        }
+                    }else{
+                        if (t_p_id){
+                            hill = true;
+                        }else{
+                            tem_points.push([this.m_x,t_y]);
+                        }
+                    }
+                };
                 break;
-            case "x":
+            case "x":   //相
                 break;
             case "s":
                 break;
