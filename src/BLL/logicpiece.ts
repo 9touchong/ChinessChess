@@ -89,7 +89,7 @@ class LogicPiece{
                 };
                 break;
             case "m":   //马
-                let possible_legpoints = [  //马腿可以走的八组位置，每组包括移动或吃子点和別腿点
+                let possible_legpoints_ma:number[][] = [  //马腿可以走的八组位置，每组包括移动或吃子点和別腿点
                     [this.m_x + 1 , this.m_y - 2 , this.m_x , this.m_y - 1],    //前两个代表移动或吃子点，后两个代表別腿点
                     [this.m_x + 2 , this.m_y - 1 , this.m_x + 1 , this.m_y],
                     [this.m_x + 2 , this.m_y + 1 , this.m_x + 1 , this.m_y],
@@ -99,7 +99,7 @@ class LogicPiece{
                     [this.m_x - 2 , this.m_y - 1 , this.m_x - 1 , this.m_y],
                     [this.m_x - 1 , this.m_y - 2 , this.m_x , this.m_y - 1],
                 ];
-                for (let t_points of possible_legpoints){
+                for (let t_points of possible_legpoints_ma){
                     if (t_points[0]<Min_x || t_points[0]>Max_x || t_points[1]<Min_y || t_points[1]>Max_y){  //跳过棋盘外点
                         continue;
                     }
@@ -115,7 +115,7 @@ class LogicPiece{
                     }
                 }
                 break;
-            case "p":   //炮  错了
+            case "p":   //炮
                 let hill:boolean = false;   //炮要隔山打
                 for (let t_x=this.m_x-1 ; t_x>=Min_x ; t_x--){    //左遍历
                     let t_p_id = map[t_x][this.m_y];
@@ -194,8 +194,62 @@ class LogicPiece{
                 };
                 break;
             case "x":   //相
+                let y_min : number;
+                let y_max : number;
+                if (this.p_faction == "r"){
+                    y_min = r_minY;
+                    y_max = r_maxY;
+                }else{  //b
+                    y_min = b_minY;
+                    y_max = b_maxY;
+                };
+                let possible_legpoints_xiang:number[][] = [   //这里设定和马类似 四组象腿可走点和别腿点 两个点四个数
+                    [this.m_x + 2 , this.m_y - 2 , this.m_x + 1 , this.m_y - 1],
+                    [this.m_x + 2 , this.m_y + 2 , this.m_x + 1 , this.m_y + 1],
+                    [this.m_x - 2 , this.m_y + 2 , this.m_x - 1 , this.m_y + 1],
+                    [this.m_x - 2 , this.m_y - 2 , this.m_x - 1 , this.m_y - 1],
+                ];
+                for (let t_points of possible_legpoints_xiang){
+                    if (t_points[0]<Min_x || t_points[0]>Max_x || t_points[1]<y_min || t_points[1]>y_max){
+                        continue;
+                    }
+                    if (map[t_points[2]][t_points[3]]){ //别腿
+                        continue;
+                    }
+                    let t_p_id = map[t_points[0]][t_points[1]];
+                    if (!t_p_id){   //空白点
+                        tem_points.push([t_points[0],t_points[1]]);
+                    }else if (piece_set[t_p_id].p_faction != this.p_faction){   //有敌子
+                        tem_points.push([t_points[0],t_points[1]]);
+                        tem_pieces.push(t_p_id);
+                    }
+                }
                 break;
             case "s":
+                let [x_min_s,x_max_s,y_min_s,y_max_s] = [0,0,0,0];
+                if (this.p_faction == "r"){
+                    [x_min_s,x_max_s,y_min_s,y_max_s] = [3,5,0,2];
+                }else{  //"b"
+                    [x_min_s,x_max_s,y_min_s,y_max_s] = [3,5,7,9];
+                };
+                let possible_landpoints_shi : number[][] = [
+                    [this.m_x + 1 , this.m_y + 1],
+                    [this.m_x + 1 , this.m_y - 1],
+                    [this.m_x - 1 , this.m_y + 1],
+                    [this.m_x - 1 , this.m_y - 1],
+                ];
+                for (let t_points of possible_landpoints_shi){
+                    if (t_points[0]<x_min_s || t_points[0]>x_max_s || t_points[1]<y_min_s || t_points[1]>y_max_s){
+                        continue;
+                    };
+                    let t_p_id = map[t_points[0]][t_points[1]];
+                    if (!t_p_id){   //空白点
+                        tem_points.push([t_points[0],t_points[1]]);
+                    }else if (piece_set[t_p_id].p_faction != this.p_faction){   //有敌子
+                        tem_points.push([t_points[0],t_points[1]]);
+                        tem_pieces.push(t_p_id);
+                    }
+                }
                 break;
             case "z":
                 break;
