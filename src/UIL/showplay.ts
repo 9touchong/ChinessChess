@@ -88,11 +88,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         }
         else{   //棋盘空白发来的
             console.log("得到棋盘空白的点击消息");
-            if (this.active_pieceId){
-                this.pieces_set[this.active_pieceId].put_down();
-                this.active_pieceId = null;
-            }
-            this.shine_sites("off");
+            this.calm_down();
         }
     }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令

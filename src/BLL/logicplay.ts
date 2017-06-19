@@ -57,21 +57,19 @@ class LogicPlay extends egret.EventDispatcher{
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
-        console.log ("收到显示层的消息",evt);
-        if (!evt._pieceID){ //不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
+        if (!evt._pieceID){ //理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
             return 0;
         }
+        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
         if (evt._moveToX!=null && evt._moveToY!=null){  //将要移动或吃子的请求
-            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
             var t_piece = this.pieces_set[evt._pieceID];
             CheAct_Event._actPieceid = t_piece.p_id;
-            
-            CheAct_Event._invalid = true;
+            CheAct_Event._invalid = true;   //这里先默认_invalid非法操作为true，因为毕竟除了达成移动或吃子的条件，其他情况的moveto请求都按非法操作处理
             t_piece.effect_update(this.Map,this.pieces_set);
             
             if (t_piece.landing_points){
-                //判断[evt._moveToX,evt._moveToY]是否在t_piece.landing_points中，方法比较笨
+                //判断[evt._moveToX,evt._moveToY]是否在t_piece.landing_points中，方法比较笨,因为js/ts没有现成的方法判断 一个数组 是否存在于 一个以数组为元素的数组中
                 let IN_landing_points = false;
                 for (let t_point of t_piece.landing_points){
                     if (t_point[0] == evt._moveToX && t_point[1] == evt._moveToY){
@@ -89,6 +87,8 @@ class LogicPlay extends egret.EventDispatcher{
                         this.Map[t_piece.m_x][t_piece.m_y] = null;
                         t_piece.move(evt._moveToX,evt._moveToY);
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
+                        CheAct_Event._change_faction = true;
+                        this.change_faction();
                     }else if (this.pieces_set[this.Map[evt._moveToX][evt._moveToY]].p_faction != t_piece.p_faction){
                         //可以吃子
                         CheAct_Event._moveToX = evt._moveToX;
@@ -99,21 +99,18 @@ class LogicPlay extends egret.EventDispatcher{
                         this.Map[t_piece.m_x][t_piece.m_y] = null;
                         t_piece.move(evt._moveToX,evt._moveToY);
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
-                    }
-                    CheAct_Event._change_faction = true;
-                    this.change_faction();
+                        CheAct_Event._change_faction = true;
+                        this.change_faction();
+                    } 
                 }
             }
-            this.showplay.dispatchEvent(CheAct_Event);
         }else{  //仅仅要求一个棋子的可移动范围等
             var t_piece = this.pieces_set[evt._pieceID];
             t_piece.effect_update(this.Map,this.pieces_set);
-            //console.log("hehrht",t_piece.landing_points);
-            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
             CheAct_Event._actPieceid = t_piece.p_id;
             CheAct_Event._effectSites = t_piece.landing_points;
             CheAct_Event._invalid = false;
-            this.showplay.dispatchEvent(CheAct_Event);
         }
+        this.showplay.dispatchEvent(CheAct_Event);
     }
 }
