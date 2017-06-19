@@ -225,7 +225,7 @@ class LogicPiece{
                     }
                 }
                 break;
-            case "s":
+            case "s":   //仕
                 let [x_min_s,x_max_s,y_min_s,y_max_s] = [0,0,0,0];
                 if (this.p_faction == "r"){
                     [x_min_s,x_max_s,y_min_s,y_max_s] = [3,5,0,2];
@@ -251,9 +251,101 @@ class LogicPiece{
                     }
                 }
                 break;
-            case "z":
+            case "z":   //卒
+                let forward_z: number;  //其实就是正负一，代表前进方向
+                let cross_river:boolean = false;    //是否过河
+                if (this.p_faction == "r"){
+                    //forward_z = (b_minY - r_maxY) / Math.abs(b_minY - r_maxY);
+                    forward_z = 1;
+                    if (this.m_y > r_maxY){
+                        cross_river = true;
+                    }
+                }else{  //b
+                    //forward_z = (r_maxY - b_minY) / Math.abs(r_maxY - b_minY);
+                    forward_z = -1;
+                    if (this.m_y < b_minY){
+                        cross_river = true;
+                    }
+                };
+                let possible_landpoints_zu : number[][];
+                if (cross_river){
+                    possible_landpoints_zu = [
+                        [this.m_x,this.m_y + forward_z],
+                        [this.m_x - 1 , this.m_y],
+                        [this.m_x + 1 , this.m_y],
+                    ];
+                }else{
+                    possible_landpoints_zu = [
+                        [this.m_x,this.m_y + forward_z],
+                    ];                    
+                };
+                for (let t_points of possible_landpoints_zu){
+                    if (t_points[0]<x_min_s || t_points[0]>x_max_s || t_points[1]<y_min_s || t_points[1]>y_max_s){
+                        continue;
+                    };
+                    let t_p_id = map[t_points[0]][t_points[1]];
+                    if (!t_p_id){   //空白点
+                        tem_points.push([t_points[0],t_points[1]]);
+                    }else if (piece_set[t_p_id].p_faction != this.p_faction){   //有敌子
+                        tem_points.push([t_points[0],t_points[1]]);
+                        tem_pieces.push(t_p_id);
+                    }
+                }
                 break;
             case "j":
+                let [x_min_j,x_max_j,y_min_j,y_max_j] = [0,0,0,0];
+                if (this.p_faction == "r"){
+                    [x_min_j,x_max_j,y_min_j,y_max_j] = [3,5,0,2];
+                }else{  //"b"
+                    [x_min_j,x_max_j,y_min_j,y_max_j] = [3,5,7,9];
+                };
+                let possible_landpoints_jiang : number[][] = [
+                    [this.m_x + 1 , this.m_y],
+                    [this.m_x - 1 , this.m_y],
+                    [this.m_x , this.m_y + 1],
+                    [this.m_x , this.m_y - 1],
+                ];
+                for (let t_points of possible_landpoints_jiang){
+                    if (t_points[0]<x_min_j || t_points[0]>x_max_j || t_points[1]<y_min_j || t_points[1]>y_max_j){
+                        continue;
+                    };
+                    let t_p_id = map[t_points[0]][t_points[1]];
+                    if (!t_p_id){   //空白点
+                        tem_points.push([t_points[0],t_points[1]]);
+                    }else if (piece_set[t_p_id].p_faction != this.p_faction){   //有敌子
+                        tem_points.push([t_points[0],t_points[1]]);
+                        tem_pieces.push(t_p_id);
+                    }
+                };
+                //帅对将情况
+                
+                if (this.p_faction == "r"){
+                    for (let t_y = this.m_y+1 ; t_y <= Max_y ; t_y++){
+                        let t_p_id = map[this.m_x][t_y];
+                        if (t_p_id){
+                            let t_p = piece_set[t_p_id];
+                            if (t_p.p_role = "j"){
+                                tem_points.push([this.m_x,t_y]);
+                                tem_pieces.push(t_p_id);
+                            }else{
+                                break;
+                            }
+                        }
+                    }
+                }else{  //b
+                    for (let t_y = this.m_y-1 ; t_y >= Min_y ; t_y--){
+                        let t_p_id = map[this.m_x][t_y];
+                        if (t_p_id){
+                            let t_p = piece_set[t_p_id];
+                            if (t_p.p_role = "j"){
+                                tem_points.push([this.m_x,t_y]);
+                                tem_pieces.push(t_p_id);
+                            }else{
+                                break;
+                            }
+                        }
+                    }
+                }
                 break;
             default:
                 tem_points = tem_pieces = null;
