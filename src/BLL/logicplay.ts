@@ -14,6 +14,7 @@ class LogicPlay extends egret.EventDispatcher{
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
     private pieces_set: Object;   //所有棋子的集合
     protected active_faction: string;  //当前应该行动的阵营,r或b
+    protected _gameover: boolean;   //标志此局游戏是否已结束
     public constructor(the_showplay?){
         super();
         if (the_showplay){
@@ -89,18 +90,26 @@ class LogicPlay extends egret.EventDispatcher{
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
                         CheAct_Event._change_faction = true;
                         this.change_faction();
-                    }else if (this.pieces_set[this.Map[evt._moveToX][evt._moveToY]].p_faction != t_piece.p_faction){
-                        //可以吃子
-                        CheAct_Event._moveToX = evt._moveToX;
-                        CheAct_Event._moveToY = evt._moveToY;
-                        CheAct_Event._dyingPieceid = this.Map[evt._moveToX][evt._moveToY];
-                        CheAct_Event._invalid = false;
-                        this.pieces_set[this.Map[evt._moveToX][evt._moveToY]].kill_self();
-                        this.Map[t_piece.m_x][t_piece.m_y] = null;
-                        t_piece.move(evt._moveToX,evt._moveToY);
-                        this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
-                        CheAct_Event._change_faction = true;
-                        this.change_faction();
+                    }else{
+                        let t_dying_p =this.pieces_set[this.Map[evt._moveToX][evt._moveToY]];
+                        if (t_dying_p.p_faction != t_piece.p_faction){
+                            //可以吃子
+                            CheAct_Event._moveToX = evt._moveToX;
+                            CheAct_Event._moveToY = evt._moveToY;
+                            CheAct_Event._dyingPieceid = this.Map[evt._moveToX][evt._moveToY];
+                            CheAct_Event._invalid = false;
+                            
+                            this.Map[t_piece.m_x][t_piece.m_y] = null;
+                            t_piece.move(evt._moveToX,evt._moveToY);
+                            this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
+                            CheAct_Event._change_faction = true;
+                            this.change_faction();
+                            t_dying_p.kill_self();
+                            if (t_dying_p.p_role == "j"){   //将被吃了
+                                CheAct_Event._gameover = true;
+                                CheAct_Event._winner = (t_dying_p.p_faction == "r") ? "b" : "r";
+                            };
+                        } 
                     } 
                 }
             }

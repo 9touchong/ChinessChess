@@ -111,6 +111,9 @@ class ShowPlay extends egret.DisplayObjectContainer{
         if (evt._change_faction){   //接受到换边的命令
             this.change_faction();
         };
+        if (evt._gameover){
+            this.game_over(evt._winner);
+        }
     }
     private change_faction(t_faction?:string){  //切换当前控制阵营
         if (t_faction){
@@ -153,5 +156,40 @@ class ShowPlay extends egret.DisplayObjectContainer{
     private movepiece(pieceID: string , m_x: number , m_y: number){
         let t_site = this.sites_tab[m_x][m_y];
         this.pieces_set[pieceID].move(m_x,m_y,t_site.x,t_site.y);
+    }
+    private game_over(winner: string){  //游戏结束胜负已分的显示
+        if (!winner){   //理论上不会出现这种情况
+            console.log("显示层收到逻辑层的gameover消息但没有winner");
+            this.calm_down();
+            return 0;
+        };
+        console.log("胜负已分");
+        //先蒙上一层幕布
+        var shape:egret.Shape = new egret.Shape();
+        shape.graphics.beginFill(0x888888);
+        shape.graphics.drawRect( 0, 0, this.stage.stageWidth, this.stage.stageHeight );
+        shape.graphics.endFill();
+        shape.alpha = 0.5;
+        shape.touchEnabled = true;
+        this.addChild( shape );
+        //显示游戏结束文字
+        var label:egret.TextField = new egret.TextField();
+        this.addChild( label );
+        label.width = 400;
+        label.height = 400;
+        label.anchorOffsetX = this.width/2;
+		label.anchorOffsetY = this.height/2;
+        label.x = this.stage.width/2;
+        label.y = this.stage.height/2;
+        label.fontFamily = "KaiTi";
+        label.textAlign = egret.HorizontalAlign.CENTER;
+        label.verticalAlign = egret.VerticalAlign.MIDDLE;
+        let str_winner: string;
+        if (winner == "r"){
+            str_winner = "红方";
+        }else{
+            str_winner = "黑方";
+        }
+        label.text = str_winner+"获胜！";
     }
 }
