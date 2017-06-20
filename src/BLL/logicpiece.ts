@@ -280,7 +280,7 @@ class LogicPiece{
                     ];                    
                 };
                 for (let t_points of possible_landpoints_zu){
-                    if (t_points[0]<x_min_s || t_points[0]>x_max_s || t_points[1]<y_min_s || t_points[1]>y_max_s){
+                    if (t_points[0]<Min_x || t_points[0]>Max_x || t_points[1]<Min_y || t_points[1]>Max_y){
                         continue;
                     };
                     let t_p_id = map[t_points[0]][t_points[1]];
@@ -324,7 +324,7 @@ class LogicPiece{
                         let t_p_id = map[this.m_x][t_y];
                         if (t_p_id){
                             let t_p = piece_set[t_p_id];
-                            if (t_p.p_role = "j"){
+                            if (t_p.p_role == "j"){
                                 tem_points.push([this.m_x,t_y]);
                                 tem_pieces.push(t_p_id);
                             }else{
@@ -337,7 +337,7 @@ class LogicPiece{
                         let t_p_id = map[this.m_x][t_y];
                         if (t_p_id){
                             let t_p = piece_set[t_p_id];
-                            if (t_p.p_role = "j"){
+                            if (t_p.p_role == "j"){
                                 tem_points.push([this.m_x,t_y]);
                                 tem_pieces.push(t_p_id);
                             }else{
