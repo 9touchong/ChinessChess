@@ -15,6 +15,7 @@ class CheActEvt extends egret.Event{
     public _invalid:boolean = false;    //为true时代表无效操作
     public _gameover:boolean = false;   //Game Over
     public _winner:string;  //r或b。当_gameover为true时这个属性才有用
+    public _reset:boolean;  //重新游戏再来一局
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }

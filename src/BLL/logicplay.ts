@@ -80,12 +80,20 @@ class LogicPlay extends egret.EventDispatcher{
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
+        if (evt._reset){
+            console.log("逻辑层收到了再来一局的请求");
+            this.startone();
+            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+            CheAct_Event._reset = true;
+            this.showplay.dispatchEvent(CheAct_Event);
+            return 0;
+        }
         if (evt._undo){
             console.log("逻辑层收到了悔棋的请求");
             this.undo(); this.undo();   //悔一合棋,也就是history中的后两个记录
             return 0;
         }
-        if (!evt._pieceID){ //除了悔棋理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
+        if (!evt._pieceID){ //除了悔棋重开等特殊情况理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
             return 0;
         }

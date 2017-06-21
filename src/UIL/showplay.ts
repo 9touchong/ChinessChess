@@ -19,6 +19,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.logic = the_logic;
     }
     public startone(){  //开一局
+        this.removeChildren();
         //棋盘和棋盘位点生成
         var board = new ChessBoardBed();
         this.addChild(board);
@@ -100,6 +101,10 @@ class ShowPlay extends egret.DisplayObjectContainer{
     }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
         console.log("收到逻辑层的消息",evt);
+        if (evt._reset){
+            console.log("收到了逻辑层传来的再来一局的命令");
+            this.startone();
+        }
         if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
             this.calm_down();
             return 0;
@@ -158,8 +163,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                 for (let t_point of this.shining_points_list){
                     this.sites_tab[t_point[0]][t_point[1]].shining("off");
                 }
-            }
-            
+            } 
             this.shining_points_list = null;
         }
     }
@@ -175,7 +179,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         };
         console.log("胜负已分");
         //先蒙上一层幕布
-        var shape:egret.Shape = new egret.Shape();
+        let shape:egret.Shape = new egret.Shape();
         shape.graphics.beginFill(0x888888);
         shape.graphics.drawRect( 0, 0, this.stage.stageWidth, this.stage.stageHeight );
         shape.graphics.endFill();
@@ -183,23 +187,30 @@ class ShowPlay extends egret.DisplayObjectContainer{
         shape.touchEnabled = true;
         this.addChild( shape );
         //显示游戏结束文字
-        var label:egret.TextField = new egret.TextField();
-        this.addChild( label );
-        label.width = 400;
-        label.height = 400;
-        label.anchorOffsetX = this.width/2;
-		label.anchorOffsetY = this.height/2;
-        label.x = this.stage.width/2;
-        label.y = this.stage.height/2;
-        label.fontFamily = "KaiTi";
-        label.textAlign = egret.HorizontalAlign.CENTER;
-        label.verticalAlign = egret.VerticalAlign.MIDDLE;
+        let game_over_label:egret.TextField = new egret.TextField();
+        this.addChild( game_over_label );
+        game_over_label.x = this.stage.width/2;
+        game_over_label.y = this.stage.height/2;
+        game_over_label.fontFamily = "KaiTi";
         let str_winner: string;
         if (winner == "r"){
             str_winner = "红方";
         }else{
             str_winner = "黑方";
         }
-        label.text = str_winner+"获胜！";
+        game_over_label.text = str_winner+"获胜！";
+        //显示再来一局
+        let reset_game_label:egret.TextField = new egret.TextField();
+        this.addChild(reset_game_label);
+        reset_game_label.x = game_over_label.x;
+        reset_game_label.y = game_over_label.y + 100;
+        reset_game_label.text = "再来一局";
+        reset_game_label.touchEnabled = true;
+        reset_game_label.addEventListener(egret.TouchEvent.TOUCH_TAP,function(){
+            console.log("点击了再来一局",this);
+            let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+            CheInput_Event._reset = true;
+            this.logic.dispatchEvent(CheInput_Event);
+        },this)
     }
 }
