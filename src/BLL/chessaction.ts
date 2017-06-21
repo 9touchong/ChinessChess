@@ -10,6 +10,7 @@ class CheActEvt extends egret.Event{
     public _moveToX:number;
     public _moveToY:number;
     public _dyingPieceid:string;    //要杀死的棋子id
+    public _revivePieceid:string;   //要复活的棋子id 当悔棋时才会有这种命令
     public _change_faction:boolean = false;  //是否要切换当前控制阵营
     public _invalid:boolean = false;    //为true时代表无效操作
     public _gameover:boolean = false;   //Game Over

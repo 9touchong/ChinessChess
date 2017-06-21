@@ -33,6 +33,11 @@ class ShowPlay extends egret.DisplayObjectContainer{
                 this.sites_tab[t_i][t_j] = t_site;
             }
         }
+        //悔棋按钮
+        var undo_btn = new Undo_Button();
+        this.addChild(undo_btn);
+        undo_btn.x = board.x + board.width;
+        undo_btn.y = board.y + board.height - 100;
         //初始化棋子及摆放
         this.pieces_set = {};
         var initMap = this.logic.initMap;
@@ -52,8 +57,10 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
         this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
-    private tra_CheInp(evt:CheInpEvt){
-        if (evt._pieceID && evt._faction){  //棋子发来的
+    private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
+        if (evt._undo){ //悔棋按钮
+            this.logic.dispatchEvent(evt);
+        }else if (evt._pieceID && evt._faction){  //棋子发来的
             if (evt._faction == this.active_faction){   //点击“己方”棋子
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
                     this.active_pieceId = null;
@@ -111,6 +118,9 @@ class ShowPlay extends egret.DisplayObjectContainer{
         if (evt._change_faction){   //接受到换边的命令
             this.change_faction();
         };
+        if (evt._revivePieceid){    //接受到要复活某子的命令
+            this.pieces_set[evt._revivePieceid].revive_self();
+        }
         if (evt._gameover){
             this.game_over(evt._winner);
         }

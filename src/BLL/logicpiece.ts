@@ -360,4 +360,7 @@ class LogicPiece{
     public kill_self(){
         this.living = false;
     }
+    public revive_self(){
+        this.living = true;
+    }
 }

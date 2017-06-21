@@ -9,6 +9,7 @@ class CheInpEvt extends egret.Event{
     //public _moveing:boolean = false;
     public _moveToX:number;
     public _moveToY:number;
+    public _undo:boolean;
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }

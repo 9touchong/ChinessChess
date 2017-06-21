@@ -15,6 +15,7 @@ class LogicPlay extends egret.EventDispatcher{
     private pieces_set: Object;   //所有棋子的集合
     protected active_faction: string;  //当前应该行动的阵营,r或b
     protected _gameover: boolean;   //标志此局游戏是否已结束
+    private HistoryList: history_record[];   //历史纪录列表
     public constructor(the_showplay?){
         super();
         if (the_showplay){
@@ -31,6 +32,26 @@ class LogicPlay extends egret.EventDispatcher{
             (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
         }
     }
+    private undo(){ //取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
+        let t_record = this.HistoryList.pop();
+        if (!t_record){
+            return 0;
+        }
+        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+        CheAct_Event._actPieceid = t_record.MovePieceId;
+        CheAct_Event._moveToX = t_record.FromX;
+        CheAct_Event._moveToY = t_record.FromY;
+        let t_act_piece = this.pieces_set[t_record.MovePieceId];
+        this.Map[t_act_piece.m_x][t_act_piece.m_y] = null;
+        t_act_piece.move(t_record.FromX,t_record.FromY);
+        this.Map[t_record.FromX][t_record.FromY] = t_record.MovePieceId;
+        if (t_record.DiePieceId){
+            let t_re_piece = this.pieces_set[t_record.DiePieceId];
+            t_re_piece.revive_self();
+            CheAct_Event._revivePieceid = t_record.DiePieceId;
+        }
+        this.showplay.dispatchEvent(CheAct_Event);
+    }
     public startone(){
         /**
          * 开一局
@@ -38,6 +59,7 @@ class LogicPlay extends egret.EventDispatcher{
          */
         this.Map = new Array();
         this.pieces_set = {};
+        this.HistoryList = new Array();
         this.change_faction("r");
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < this.initMap.length ; t_i++){
@@ -58,7 +80,12 @@ class LogicPlay extends egret.EventDispatcher{
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
-        if (!evt._pieceID){ //理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
+        if (evt._undo){
+            console.log("逻辑层收到了悔棋的请求");
+            this.undo(); this.undo();   //悔一合棋,也就是history中的后两个记录
+            return 0;
+        }
+        if (!evt._pieceID){ //除了悔棋理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
             return 0;
         }
@@ -85,9 +112,18 @@ class LogicPlay extends egret.EventDispatcher{
                         CheAct_Event._moveToX = evt._moveToX;
                         CheAct_Event._moveToY = evt._moveToY;
                         CheAct_Event._invalid = false;
+
+                        let t_record = new history_record();
+                        t_record.ActFaction = this.active_faction;
+                        t_record.MovePieceId = t_piece.p_id;
+                        t_record.FromX = t_piece.m_x;
+                        t_record.FromY = t_piece.m_y;
+                        this.HistoryList.push(t_record);
+
                         this.Map[t_piece.m_x][t_piece.m_y] = null;
                         t_piece.move(evt._moveToX,evt._moveToY);
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
+
                         CheAct_Event._change_faction = true;
                         this.change_faction();
                     }else{
@@ -98,6 +134,14 @@ class LogicPlay extends egret.EventDispatcher{
                             CheAct_Event._moveToY = evt._moveToY;
                             CheAct_Event._dyingPieceid = this.Map[evt._moveToX][evt._moveToY];
                             CheAct_Event._invalid = false;
+
+                            let t_record = new history_record();
+                            t_record.ActFaction = this.active_faction;
+                            t_record.MovePieceId = t_piece.p_id;
+                            t_record.FromX = t_piece.m_x;
+                            t_record.FromY = t_piece.m_y;
+                            t_record.DiePieceId = t_dying_p.p_id;
+                            this.HistoryList.push(t_record);
                             
                             this.Map[t_piece.m_x][t_piece.m_y] = null;
                             t_piece.move(evt._moveToX,evt._moveToY);

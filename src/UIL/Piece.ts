@@ -41,7 +41,10 @@ class Piece extends egret.Bitmap {
 		this.y = p_y;
 	}
 	public kill_self(){
-		this.visible = false;	//这里用父级remove，要考虑悔棋的情况
+		this.visible = false;	//这里如果用父级remove，要考虑悔棋的情况
+	}
+	public revive_self(){
+		this.visible = true;
 	}
 	private ontap(evt:egret.TouchEvent){
 		//console.log("you have click a piece");
