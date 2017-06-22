@@ -104,6 +104,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         if (evt._reset){
             console.log("收到了逻辑层传来的再来一局的命令");
             this.startone();
+            return 0;
         }
         if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
             this.calm_down();
