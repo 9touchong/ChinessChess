@@ -5,6 +5,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
     protected active_faction: string;  //当前应该行动的阵营,r或b
     protected shining_points_list;   //当前高亮显示的位点列表，用[m_x,m_y]表示
+    protected human_faction: string;    //玩家控制方 r或b
     public constructor(the_logic?){
         /**
          *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
@@ -19,7 +20,11 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.logic = the_logic;
     }
     public startone(){  //开一局
+        if (!this.logic){
+            console.log("logic与show必须互相绑定");
+        }
         this.removeChildren();
+        this.human_faction = this.logic.human_faction;
         //棋盘和棋盘位点生成
         var board = new ChessBoardBed();
         this.addChild(board);

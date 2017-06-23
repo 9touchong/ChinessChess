@@ -14,6 +14,7 @@ class LogicPlay extends egret.EventDispatcher{
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
     private pieces_set: Object;   //所有棋子的集合
     protected active_faction: string;  //当前应该行动的阵营,r或b
+    protected human_faction: string;    //玩家控制方 r或b
     protected _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
     public constructor(the_showplay?){
@@ -57,9 +58,14 @@ class LogicPlay extends egret.EventDispatcher{
          * 开一局
          * 先进行Map、pieces_set的初始化工作和棋子的生成
          */
+        if (!this.showplay){
+            console.log("logic与show必须互相绑定");
+            return 0;
+        }
         this.Map = new Array();
         this.pieces_set = {};
         this.HistoryList = new Array();
+        this.human_faction = "r";
         this.change_faction("r");
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < this.initMap.length ; t_i++){

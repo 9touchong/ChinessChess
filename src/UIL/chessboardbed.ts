@@ -1,7 +1,11 @@
 class ChessBoardBed extends egret.Bitmap{
     public sites_points;   //棋盘所有落点的坐标 一个9*10的二维数组
-    public constructor(){
+    protected _reverse:boolean;    //是否逆向显示，正向时红在上，逆向时黑在上
+    public constructor(reverse?:boolean){
         super();
+        if (reverse){
+            this._reverse = true;
+        }
         let texture: egret.Texture = RES.getRes("board_png");
         this.texture = texture;
         this.touchEnabled = true;
