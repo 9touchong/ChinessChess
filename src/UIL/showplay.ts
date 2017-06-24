@@ -22,11 +22,16 @@ class ShowPlay extends egret.DisplayObjectContainer{
     public startone(){  //开一局
         if (!this.logic){
             console.log("logic与show必须互相绑定");
+            return 0;
         }
         this.removeChildren();
         this.human_faction = this.logic.human_faction;
         //棋盘和棋盘位点生成
-        var board = new ChessBoardBed();
+        if (this.human_faction == "r"){
+            var board = new ChessBoardBed(true);
+        }else{
+            var board = new ChessBoardBed();
+        };
         this.addChild(board);
         board.gene_sites_points();
         this.sites_tab = new Array();
@@ -42,8 +47,8 @@ class ShowPlay extends egret.DisplayObjectContainer{
         //悔棋按钮
         var undo_btn = new Undo_Button();
         this.addChild(undo_btn);
-        undo_btn.x = board.x + board.width;
-        undo_btn.y = board.y + board.height - 100;
+        undo_btn.x = board.x + board.width/2;
+        undo_btn.y = board.y + board.height/2 - 100;
         //初始化棋子及摆放
         this.pieces_set = {};
         var initMap = this.logic.initMap;

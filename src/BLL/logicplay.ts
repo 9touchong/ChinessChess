@@ -32,8 +32,11 @@ class LogicPlay extends egret.EventDispatcher{
         }else{
             (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
         }
+        if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
+            this.ai_act();
+        }
     }
-    private undo(){ //取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
+    private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
         let t_record = this.HistoryList.pop();
         if (!t_record){
             return 0;
@@ -86,6 +89,7 @@ class LogicPlay extends egret.EventDispatcher{
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
+        let whether_change_faction: boolean = false;    //标记是否换边，但不能当时马上换，要在把返回给表现层的消息发出之后再执行
         if (evt._reset){
             console.log("逻辑层收到了再来一局的请求");
             this.startone();
@@ -139,7 +143,8 @@ class LogicPlay extends egret.EventDispatcher{
                         this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
 
                         CheAct_Event._change_faction = true;
-                        this.change_faction();
+                        //this.change_faction();
+                        whether_change_faction = true;
                     }else{
                         let t_dying_p =this.pieces_set[this.Map[evt._moveToX][evt._moveToY]];
                         if (t_dying_p.p_faction != t_piece.p_faction){
@@ -161,7 +166,8 @@ class LogicPlay extends egret.EventDispatcher{
                             t_piece.move(evt._moveToX,evt._moveToY);
                             this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
                             CheAct_Event._change_faction = true;
-                            this.change_faction();
+                            //this.change_faction();
+                            whether_change_faction = true;
                             t_dying_p.kill_self();
                             if (t_dying_p.p_role == "j"){   //将被吃了
                                 CheAct_Event._gameover = true;
@@ -179,5 +185,35 @@ class LogicPlay extends egret.EventDispatcher{
             CheAct_Event._invalid = false;
         }
         this.showplay.dispatchEvent(CheAct_Event);
+        if (whether_change_faction){
+            this.change_faction();
+        }
+    }
+    private ai_act(){   //目前是一个伪AI，只是在合法走法中随机选一个
+        console.log("AI start!!");
+        let act_piece;
+        let [min_x,max_x,min_y,max_y] = [0,8,0,9];
+        while(1){
+            let t_x: number = Math.floor(min_x + Math.random() * (max_x - min_x));
+            let t_y: number = Math.floor(min_y + Math.random() * (max_y - min_y));
+            if (!this.Map[t_x][t_y]){
+                continue;
+            };
+            let t_piece = this.pieces_set[this.Map[t_x][t_y]];
+            if (this.human_faction != t_piece.p_faction){   //是AI控制放棋子
+                t_piece.effect_update(this.Map,this.pieces_set);
+                if (t_piece.landing_points && t_piece.landing_points.length > 0){
+                    act_piece = t_piece;
+                    break;
+                }
+            }
+        }
+        console.log("AI test",act_piece);
+        let CheInp_Event: CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+        let m_point = act_piece.landing_points[0];
+        CheInp_Event._pieceID = act_piece.p_id;
+        CheInp_Event._moveToX = m_point[0];
+        CheInp_Event._moveToY = m_point[1];
+        this.reply_showplay(CheInp_Event);
     }
 }

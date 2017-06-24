@@ -19,10 +19,19 @@ class ChessBoardBed extends egret.Bitmap{
          * 一些诸如spaceX之类的变量因为只在这里用一次就不设为类属性了
          */
         this.place_board();
-        var startX = this.x + 22;
-        var startY = this.y + 23;
-        var spaceX:number = 57;
-        var spaceY:number = 57;
+        let startX,startY,spaceX,spaceY:number;
+        if (this._reverse){
+            startX = this.x + this.width/2 - 22;
+            startY = this.y + this.height/2 - 23;
+            spaceX = -57;
+            spaceY = -57;
+        }else{
+            startX = this.x - this.width/2 + 22;
+            startY = this.y - this.height/2 + 23;
+            spaceX = 57;
+            spaceY = 57;
+        }
+        
         this.sites_points = new Array();
         for (var t_i = 0 ; t_i < 9 ; t_i++){
             this.sites_points[t_i] = new Array();
@@ -32,8 +41,13 @@ class ChessBoardBed extends egret.Bitmap{
         }
     }
     private place_board(){   //安放棋盘到画面中央
-        this.x = (this.parent.stage.stageWidth - this.width)/2;
-        this.y = (this.parent.stage.stageHeight - this.height)/2;
+        this.anchorOffsetX = this.width/2;
+        this.anchorOffsetY = this.height/2;
+        if (this._reverse){
+            this.rotation = 180;
+        }
+        this.x = this.parent.stage.stageWidth/2;
+        this.y = this.parent.stage.stageHeight/2;
     }
     private ontap(evt:egret.TouchEvent){
         let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
