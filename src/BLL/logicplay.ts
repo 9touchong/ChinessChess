@@ -13,9 +13,9 @@ class LogicPlay extends egret.EventDispatcher{
     private showplay;
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
     private pieces_set: Object;   //所有棋子的集合
-    protected active_faction: string;  //当前应该行动的阵营,r或b
-    protected human_faction: string;    //玩家控制方 r或b
-    protected _gameover: boolean;   //标志此局游戏是否已结束
+    private active_faction: string;  //当前应该行动的阵营,r或b
+    private human_faction: string;    //玩家控制方 r或b
+    private _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
     public constructor(the_showplay?){
         super();
@@ -109,15 +109,16 @@ class LogicPlay extends egret.EventDispatcher{
         }
         let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
         if (evt._moveToX!=null && evt._moveToY!=null){  //将要移动或吃子的请求
-            var t_piece = this.pieces_set[evt._pieceID];
-            CheAct_Event._actPieceid = t_piece.p_id;
+            let t_piece : LogicPiece  = this.pieces_set[evt._pieceID];
+            CheAct_Event._actPieceid = evt._pieceID;
             CheAct_Event._invalid = true;   //这里先默认_invalid非法操作为true，因为毕竟除了达成移动或吃子的条件，其他情况的moveto请求都按非法操作处理
             t_piece.effect_update(this.Map,this.pieces_set);
             
-            if (t_piece.landing_points){
+            let landing_points = t_piece.get_property("landing_points");
+            if (landing_points){
                 //判断[evt._moveToX,evt._moveToY]是否在t_piece.landing_points中，方法比较笨,因为js/ts没有现成的方法判断 一个数组 是否存在于 一个以数组为元素的数组中
                 let IN_landing_points = false;
-                for (let t_point of t_piece.landing_points){
+                for (let t_point of landing_points){
                     if (t_point[0] == evt._moveToX && t_point[1] == evt._moveToY){
                         IN_landing_points = true;
                         break;
@@ -133,21 +134,21 @@ class LogicPlay extends egret.EventDispatcher{
 
                         let t_record = new history_record();
                         t_record.ActFaction = this.active_faction;
-                        t_record.MovePieceId = t_piece.p_id;
-                        t_record.FromX = t_piece.m_x;
-                        t_record.FromY = t_piece.m_y;
+                        t_record.MovePieceId = t_piece.get_property("p_id");
+                        t_record.FromX = t_piece.get_property("m_x");
+                        t_record.FromY = t_piece.get_property("m_y");
                         this.HistoryList.push(t_record);
 
-                        this.Map[t_piece.m_x][t_piece.m_y] = null;
+                        this.Map[t_record.FromX][t_record.FromY] = null;
                         t_piece.move(evt._moveToX,evt._moveToY);
-                        this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
+                        this.Map[evt._moveToX][evt._moveToY] = t_record.MovePieceId;
 
                         CheAct_Event._change_faction = true;
                         //this.change_faction();
                         whether_change_faction = true;
                     }else{
-                        let t_dying_p =this.pieces_set[this.Map[evt._moveToX][evt._moveToY]];
-                        if (t_dying_p.p_faction != t_piece.p_faction){
+                        let t_dying_p: LogicPiece =this.pieces_set[this.Map[evt._moveToX][evt._moveToY]];
+                        if (t_dying_p.get_property("p_faction") != t_piece.get_property("p_faction")){
                             //可以吃子
                             CheAct_Event._moveToX = evt._moveToX;
                             CheAct_Event._moveToY = evt._moveToY;
@@ -156,32 +157,32 @@ class LogicPlay extends egret.EventDispatcher{
 
                             let t_record = new history_record();
                             t_record.ActFaction = this.active_faction;
-                            t_record.MovePieceId = t_piece.p_id;
-                            t_record.FromX = t_piece.m_x;
-                            t_record.FromY = t_piece.m_y;
-                            t_record.DiePieceId = t_dying_p.p_id;
+                            t_record.MovePieceId = t_piece.get_property("p_id");
+                            t_record.FromX = t_piece.get_property("m_x");
+                            t_record.FromY = t_piece.get_property("m_y");
+                            t_record.DiePieceId = t_dying_p.get_property("p_id");
                             this.HistoryList.push(t_record);
                             
-                            this.Map[t_piece.m_x][t_piece.m_y] = null;
+                            this.Map[t_record.FromX][t_record.FromY] = null;
                             t_piece.move(evt._moveToX,evt._moveToY);
-                            this.Map[evt._moveToX][evt._moveToY] = t_piece.p_id;
+                            this.Map[evt._moveToX][evt._moveToY] = t_record.MovePieceId;
                             CheAct_Event._change_faction = true;
                             //this.change_faction();
                             whether_change_faction = true;
                             t_dying_p.kill_self();
-                            if (t_dying_p.p_role == "j"){   //将被吃了
+                            if (t_dying_p.get_property("p_role") == "j"){   //将被吃了
                                 CheAct_Event._gameover = true;
-                                CheAct_Event._winner = (t_dying_p.p_faction == "r") ? "b" : "r";
+                                CheAct_Event._winner = (t_dying_p.get_property("p_faction") == "r") ? "b" : "r";
                             };
                         } 
                     } 
                 }
             }
         }else{  //仅仅要求一个棋子的可移动范围等
-            var t_piece = this.pieces_set[evt._pieceID];
+            let t_piece: LogicPiece = this.pieces_set[evt._pieceID];
             t_piece.effect_update(this.Map,this.pieces_set);
-            CheAct_Event._actPieceid = t_piece.p_id;
-            CheAct_Event._effectSites = t_piece.landing_points;
+            CheAct_Event._actPieceid = t_piece.get_property("p_id");
+            CheAct_Event._effectSites = t_piece.get_property("landing_points");
             CheAct_Event._invalid = false;
         }
         this.showplay.dispatchEvent(CheAct_Event);

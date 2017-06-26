@@ -25,6 +25,38 @@ class LogicPiece{
     public set_p_id(p_id:string){
 		this.p_id = p_id;
 	}
+    public get_property(property:string){
+        let return_property: any;
+        switch (property){
+            case "m_x":
+                return_property =  this.m_x;
+                break;
+            case "m_y":
+                return_property =  this.m_y;
+                break;
+            case "p_role":
+                return_property =  this.p_role;
+                break;
+            case "p_faction":
+                return_property =  this.p_faction;
+                break;
+            case "p_id":
+                return_property =  this.p_id;
+                break;
+            case "living":
+                return_property =  this.living;
+                break;
+            case "landing_points":
+                return_property =  this.landing_points;
+                break;
+            case "menace_pieces":
+                return_property =  this.menace_pieces;
+                break;
+            default:
+                return null;
+        }
+        return return_property;
+    }
     public effect_update(map,piece_set){
         /**
          * 影响力更新
