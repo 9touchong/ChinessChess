@@ -9,7 +9,7 @@ class LogicPlay extends egret.EventDispatcher{
         [["x","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["x","b"]],
         [["m","r"],         ,["p","r"],         ,         ,         ,         ,["p","b"],         ,["m","b"]],
         [["c","r"],         ,         ,["z","r"],         ,         ,["z","b"],         ,         ,["c","b"]]
-    ];//注意这数组，看起来就像是反了一样,以后再完善时，这里应该从数据层得到，所以现在设为public也是可以的
+    ];//注意这数组，看起来就像是反了一样,以后再完善时，这里应该从数据层得到，所以现在设为public也是可以的.可以看作是侧视图
     private showplay;
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
     private pieces_set: Object;   //所有棋子的集合
@@ -17,6 +17,7 @@ class LogicPlay extends egret.EventDispatcher{
     private human_faction: string;    //玩家控制方 r或b
     private _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
+    private AI;
     public constructor(the_showplay?){
         super();
         if (the_showplay){
@@ -85,7 +86,9 @@ class LogicPlay extends egret.EventDispatcher{
                     this.Map[t_i][t_j] = null;
                 }  
             }
-        }
+        };
+        let AI_faction = (this.human_faction == "r") ? "b" : "r";
+        this.AI = new AI(this.Map,this.pieces_set,AI_faction);
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
@@ -192,6 +195,14 @@ class LogicPlay extends egret.EventDispatcher{
     }
     private ai_act(){   //目前是一个伪AI，只是在合法走法中随机选一个
         console.log("AI start!!");
+        //TTTTTTTTTTTTT
+        let t_map = this.AI.get_map();
+        for (let t_x = 0 ; t_x < 9 ; t_x++){
+            for (let t_y = 0 ; t_y < 10 ; t_y++){
+                console.log(this.Map[t_x][t_y]==t_map[t_x][t_y]);
+            }
+        }
+        //TTTTTTTTTTTTT
         let act_piece;
         let [min_x,max_x,min_y,max_y] = [0,8,0,9];
         while(1){
