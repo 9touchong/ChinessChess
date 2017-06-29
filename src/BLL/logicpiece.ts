@@ -65,6 +65,16 @@ class LogicPiece{
          * 参数map和p_set就是LogicPlay中的Map和pieces_set；
          * 不设返回值，只是更新当前棋子的landing_points和menace_pieces属性
          */
+        if (map[this.m_x][this.m_y] != this.p_id){  //要首先验证map与棋子本身位置状态是否一致，否则以map校准
+            for (let t_x = 0 ; t_x < map.length ; t_x++){
+                for (let t_y = 0 ; t_y < map[t_x].length ; t_y++){
+                    if (map[t_x][t_y] == this.p_id){
+                        this.move(t_x,t_y);
+                        break;
+                    }
+                }
+            };
+        };
         let tem_points = [];
         let tem_pieces = [];
         let [Min_x,Min_y,Max_x,Max_y] = [0,0,8,9]; //map的最大范围，横9纵10，这样声明一下主要便于以后修改
@@ -88,7 +98,7 @@ class LogicPiece{
                     if (!t_p_id){  //未遇到棋子
                         tem_points.push([t_x,this.m_y]);
                     }else{  //遇到棋子
-                        if (piece_set[t_p_id].p_faction != this.p_faction){ //敌子
+                        if (piece_set[t_p_id].get_property("p_faction") != this.p_faction){ //敌子
                             tem_points.push([t_x,this.m_y]);
                             tem_pieces.push(t_p_id);
                         }

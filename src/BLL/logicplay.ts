@@ -196,12 +196,7 @@ class LogicPlay extends egret.EventDispatcher{
     private ai_act(){   //目前是一个伪AI，只是在合法走法中随机选一个
         console.log("AI start!!");
         //TTTTTTTTTTTTT
-        let t_map = this.AI.get_map();
-        for (let t_x = 0 ; t_x < 9 ; t_x++){
-            for (let t_y = 0 ; t_y < 10 ; t_y++){
-                console.log(this.Map[t_x][t_y]==t_map[t_x][t_y]);
-            }
-        }
+        this.AI.doTest();
         //TTTTTTTTTTTTT
         let act_piece;
         let [min_x,max_x,min_y,max_y] = [0,8,0,9];

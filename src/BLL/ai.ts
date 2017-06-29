@@ -6,12 +6,13 @@ class AI{
     private Map;
     private pieces_set;
     private VALUE_set;  //子力表,记录或定义每个子在每个位置的价值
+    private treeDepth: number;
     public constructor(Map,pieces_set,AI_faction){
         this.Map = Map;
         this.pieces_set = pieces_set;
         this.AI_faction = AI_faction;
+        this.treeDepth = 4;
         this.gene_VALUE_set();
-        console.log("AI VALUE_set",this.VALUE_set);
     }
     private arr2clone(ori_arr){    //得到一个二维数组的克隆
         let new_arr = [];
@@ -110,5 +111,116 @@ class AI{
             };
             this.VALUE_set["b"][k] = t_2arr;
         };
+    }
+    private getMoves(map?,faction?){
+        /**
+         * //取得当前this.Map或传入map棋谱下，AI_faction或传入阵营的所有棋子所有可能着法
+         * return一个数组，元素是一个{"move_id": ,"oldX": ,"oldY": ,"newX": ,"newY": }
+         */
+        if (!map){map = this.Map;};
+        if (!faction){faction = this.AI_faction;};
+        let Moves = new Array();
+        for (let t_x = 0 ; t_x < map.length ; t_x++){
+            for (let t_y = 0 ; t_y < map[t_x].length ; t_y++){
+                let t_p_id = map[t_x][t_y];
+                if (!t_p_id){
+                    continue;
+                };
+                let t_piece:LogicPiece = this.pieces_set[t_p_id];
+                if (t_piece.get_property("p_faction") != faction){
+                    continue;
+                };
+                t_piece.effect_update(map,this.pieces_set);
+                for (let t_point of t_piece.get_property("landing_points")){
+                    Moves.push({"move_id":t_p_id,"oldX":t_x,"oldY":t_y,"newX":t_point[0],"newY":t_point[1]});
+                }
+            }
+        };
+        return Moves;
+    }
+    private getEvaluate(map?,faction?){
+        /**
+         * //取得当前this.Map或传入map棋谱下，AI_faction或传入阵营的 棋面评价
+         * 返回的应该是一个整数
+         * 无论faction是什么期望的评价都是正的越大越好
+         */
+        if (!map){map = this.Map;};
+        if (!faction){faction = this.AI_faction;};
+        let Sum_value: number = 0;
+        for (let t_x = 0 ; t_x < map.length ; t_x++){
+            for (let t_y = 0 ; t_y < map[t_x].length ; t_y++){
+                if (!map[t_x][t_y]){
+                    continue;
+                };
+                let t_piece = this.pieces_set[map[t_x][t_y]];
+                let t_role = t_piece.get_property("p_role");
+                let t_faction = t_piece.get_property("p_faction");
+                let t_value = this.VALUE_set[t_faction][t_role][t_x][t_y];
+                if (t_faction == faction){
+                    Sum_value += t_value;
+                }else{
+                    Sum_value -= t_value;
+                }
+            }
+        };
+        return Sum_value;
+    }
+    private getAlphaBeta(A, B, depth, map ,faction){
+        /**
+         * A:当前棋手value  B:对手value  depth：层级
+         * 若有最佳解，返回一个与getMoves部分类似的obj,{"move_id": ,"oldX": ,"oldY": ,"newX": ,"newY": ,"value": };只多了个评分
+         */
+        if (depth == 0){
+            return {"value":this.getEvaluate(map,faction)};
+        }
+        let Moves = this.getMoves(map,faction);
+        for (let move of Moves){
+            //走这个走法
+            let dying_id = map[move["newX"]][move["newY"]]; //注意可能为null
+            map[move["newX"]][move["newY"]] = move["move_id"];
+            map[move["oldX"]][move["oldY"]] = null;
+            this.pieces_set[move["move_id"]].move(move["newX"],move["newY"]);
+            if (dying_id && this.pieces_set[dying_id].get_property("p_role") == "j"){   //吃的是将
+                //先撤销走法
+                map[move["oldX"]][move["oldY"]] = move["move_id"];
+                map[move["newX"]][move["newY"]] = dying_id;
+                this.pieces_set[move["move_id"]].move(move["oldX"],move["oldY"]);
+                //直接return rootKey
+                return {"move_id":move["move_id"],"oldX":move["oldX"],"oldY":move["oldY"],"newX":move["newX"],"newY":move["newY"],"value":8888}
+            }else{
+                let val: number;
+                let next_val = this.getAlphaBeta(-B , -A , depth-1 , map , (faction == "r") ? "b" : "r");
+                if (next_val){
+                    val = -next_val.value;
+                }else{
+                    val = null;
+                }
+                //撤销走法
+                map[move["oldX"]][move["oldY"]] = move["move_id"];
+                map[move["newX"]][move["newY"]] = dying_id;
+                this.pieces_set[move["move_id"]].move(move["oldX"],move["oldY"]);
+                if (val >= B){
+                    return {"move_id":move["move_id"],"oldX":move["oldX"],"oldY":move["oldY"],"newX":move["newX"],"newY":move["newY"],"value":B};
+                };
+                if (val > A){
+                    A = val;    //更新最佳走法
+                    if (this.treeDepth == depth){
+                        var rootKey= {"move_id":move["move_id"],"oldX":move["oldX"],"oldY":move["oldY"],"newX":move["newX"],"newY":move["newY"],"value":A};
+                    }
+                };
+            }
+            
+        };
+        if (this.treeDepth == depth){
+            if (!rootKey){
+                return false;
+            }else{
+                return rootKey;
+            }
+        };
+        return {"value":A};
+    }
+    public doTest(){
+        console.log("getAlphaBeta",this.getAlphaBeta(-99999,99999,this.treeDepth,this.arr2clone(this.Map),this.AI_faction));
     }
 }
