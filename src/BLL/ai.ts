@@ -220,7 +220,7 @@ class AI{
         };
         return {"value":A};
     }
-    public doTest(){
-        console.log("getAlphaBeta",this.getAlphaBeta(-99999,99999,this.treeDepth,this.arr2clone(this.Map),this.AI_faction));
+    public oneAImove(){
+        return this.getAlphaBeta(-99999,99999,this.treeDepth,this.arr2clone(this.Map),this.AI_faction);
     }
 }
