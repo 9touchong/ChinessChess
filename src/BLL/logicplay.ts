@@ -208,9 +208,9 @@ class LogicPlay extends egret.EventDispatcher{
             console.log("AI 不会走了 准备认输了");
             return CheInp_Event;
         };
-        CheInp_Event._pieceID = move_order.move_id;
-        CheInp_Event._moveToX = move_order.newX;
-        CheInp_Event._moveToY = move_order.newY;
+        //CheInp_Event._pieceID = move_order.move_id;
+        //CheInp_Event._moveToX = move_order.newX;
+        //CheInp_Event._moveToY = move_order.newY;
         //this.reply_showplay(CheInp_Event);
         return CheInp_Event;
     }
