@@ -200,6 +200,7 @@ class LogicPlay extends egret.EventDispatcher{
         this.showplay.dispatchEvent(CheAct_Event,true);
         console.log("haha2",new Date().getTime());
     }
+<<<<<<< HEAD
     private ai_act(){   //AI,模拟一个CheInpEvt事件，并返回
         console.log("AI start!!",new Date().getTime());
         let move_order = this.AI.oneAImove();
@@ -213,5 +214,36 @@ class LogicPlay extends egret.EventDispatcher{
         //CheInp_Event._moveToY = move_order.newY;
         //this.reply_showplay(CheInp_Event);
         return CheInp_Event;
+=======
+    private ai_act(){   //目前是一个伪AI，只是在合法走法中随机选一个
+        console.log("AI start!!");
+        //TTTTTTTTTTTTT
+        this.AI.doTest();
+        //TTTTTTTTTTTTT
+        let act_piece;
+        let [min_x,max_x,min_y,max_y] = [0,8,0,9];
+        while(1){
+            let t_x: number = Math.floor(min_x + Math.random() * (max_x - min_x));
+            let t_y: number = Math.floor(min_y + Math.random() * (max_y - min_y));
+            if (!this.Map[t_x][t_y]){
+                continue;
+            };
+            let t_piece = this.pieces_set[this.Map[t_x][t_y]];
+            if (this.human_faction != t_piece.p_faction){   //是AI控制放棋子
+                t_piece.effect_update(this.Map,this.pieces_set);
+                if (t_piece.landing_points && t_piece.landing_points.length > 0){
+                    act_piece = t_piece;
+                    break;
+                }
+            }
+        }
+        console.log("AI test",act_piece);
+        let CheInp_Event: CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+        let m_point = act_piece.landing_points[0];
+        CheInp_Event._pieceID = act_piece.p_id;
+        CheInp_Event._moveToX = m_point[0];
+        CheInp_Event._moveToY = m_point[1];
+        this.reply_showplay(CheInp_Event);
+>>>>>>> parent of 7a05a23... AI 初级简单实现
     }
 }

@@ -11,8 +11,11 @@ class CheInpEvt extends egret.Event{
     public _moveToY:number;
     public _undo:boolean;   //悔棋
     public _reset:boolean;  //重新游戏
+<<<<<<< HEAD
     public _giveup:boolean; //认输
     public _AiAct:boolean;  //AI走棋
+=======
+>>>>>>> parent of 7a05a23... AI 初级简单实现
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }
