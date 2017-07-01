@@ -33,9 +33,6 @@ class LogicPlay extends egret.EventDispatcher{
         }else{
             (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
         }
-        if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
-            this.ai_act();
-        }
     }
     private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
         let t_record = this.HistoryList.pop();
@@ -91,7 +88,7 @@ class LogicPlay extends egret.EventDispatcher{
         this.AI = new AI(this.Map,this.pieces_set,AI_faction);
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
-    private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
+    private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的CheInpEvt事件请求，当然也有不是表现层发来的，比如AI相关,假扮的
         let whether_change_faction: boolean = false;    //标记是否换边，但不能当时马上换，要在把返回给表现层的消息发出之后再执行
         if (evt._reset){
             console.log("逻辑层收到了再来一局的请求");
@@ -105,6 +102,14 @@ class LogicPlay extends egret.EventDispatcher{
             console.log("逻辑层收到了悔棋的请求");
             this.undo(); this.undo();   //悔一合棋,也就是history中的后两个记录
             return 0;
+        }
+         if (evt._AiAct){
+            console.log("到了evt._AiAct");
+            if (this.active_faction == this.human_faction){
+                console.log("逻辑层warn：在人类玩家回合行动期间接收到非法AI行动命令");
+                return 0;
+            }
+            evt = this.ai_act();
         }
         if (!evt._pieceID){ //除了悔棋重开等特殊情况理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
@@ -187,23 +192,26 @@ class LogicPlay extends egret.EventDispatcher{
             CheAct_Event._actPieceid = t_piece.get_property("p_id");
             CheAct_Event._effectSites = t_piece.get_property("landing_points");
             CheAct_Event._invalid = false;
-        }
-        this.showplay.dispatchEvent(CheAct_Event);
+        };
         if (whether_change_faction){
             this.change_faction();
-        }
+        };
+        console.log("haha1",new Date().getTime());
+        this.showplay.dispatchEvent(CheAct_Event,true);
+        console.log("haha2",new Date().getTime());
     }
-    private ai_act(){   //目前是一个伪AI，只是在合法走法中随机选一个
-        console.log("AI start!!");
+    private ai_act(){   //AI,模拟一个CheInpEvt事件，并返回
+        console.log("AI start!!",new Date().getTime());
         let move_order = this.AI.oneAImove();
+        let CheInp_Event: CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
         if (!move_order){
             console.log("AI 不会走了 准备认输了");
-            return 0;
+            return CheInp_Event;
         };
-        let CheInp_Event: CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
         CheInp_Event._pieceID = move_order.move_id;
         CheInp_Event._moveToX = move_order.newX;
         CheInp_Event._moveToY = move_order.newY;
-        this.reply_showplay(CheInp_Event);
+        //this.reply_showplay(CheInp_Event);
+        return CheInp_Event;
     }
 }

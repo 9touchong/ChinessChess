@@ -12,6 +12,7 @@ class CheInpEvt extends egret.Event{
     public _undo:boolean;   //悔棋
     public _reset:boolean;  //重新游戏
     public _giveup:boolean; //认输
+    public _AiAct:boolean;  //AI走棋
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }

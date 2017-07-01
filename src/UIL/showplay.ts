@@ -70,7 +70,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
     }
     private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
         if (evt._undo){ //悔棋按钮
-            this.logic.dispatchEvent(evt);
+            this.logic.dispatchEvent(evt,true);
         }else if (evt._pieceID && evt._faction){  //棋子发来的
             if (evt._faction == this.active_faction){   //点击“己方”棋子
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
@@ -83,7 +83,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     };
                     this.active_pieceId = evt._pieceID;
                     this.pieces_set[this.active_pieceId].picking_up();
-                    this.logic.dispatchEvent(evt);  //将CheInpEvt转发给逻辑层
+                    this.logic.dispatchEvent(evt,true);  //将CheInpEvt转发给逻辑层
                 }
             }else{  //点击敌方棋子
                 if (this.active_pieceId){
@@ -92,7 +92,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     evt._moveToY = t_piece.m_y;
                     evt._pieceID = this.active_pieceId;
                     evt._faction = this.pieces_set[evt._pieceID].p_faction;
-                    this.logic.dispatchEvent(evt);
+                    this.logic.dispatchEvent(evt,true);
                 }
                 this.calm_down();
             }
@@ -101,7 +101,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
             console.log("得到一个位点的点击消息");
             if (this.active_pieceId){   //如果没有棋子，单纯的位点没作用
                 evt._pieceID = this.active_pieceId;
-                this.logic.dispatchEvent(evt);
+                this.logic.dispatchEvent(evt,true);
             }
         }
         else{   //棋盘空白发来的
@@ -110,7 +110,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         }
     }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
-        console.log("收到逻辑层的消息",evt);
+        console.log("收到逻辑层的消息",new Date().getTime(),evt);
         if (evt._reset){
             console.log("收到了逻辑层传来的再来一局的命令");
             this.startone();
@@ -140,12 +140,20 @@ class ShowPlay extends egret.DisplayObjectContainer{
         if (evt._gameover){
             this.game_over(evt._winner);
         }
+        
+        console.log("do_Action 处理完成",new Date().getTime(),evt);
     }
     private change_faction(t_faction?:string){  //切换当前控制阵营
         if (t_faction){
             this.active_faction = t_faction;
         }else{
             (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
+        }
+        if (this.active_faction != this.human_faction){
+            //console.log("显示层轮到AI了",new Date().getTime());
+            //let CheInp_Event: CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
+            //CheInp_Event._AiAct = true;
+            //this.logic.dispatchEvent(CheInp_Event,true);
         }
     }
     private calm_down(){    //所有激活状态的元件复归平静

@@ -32,4 +32,18 @@ class ChessBoardSite extends egret.Shape{  //棋盘位点,暨可点击区域
             this.alpha = 0;
         }
     }
+    public get_property(property:string){
+        let return_property: any;
+        switch (property){
+            case "m_x":
+                return_property = this.m_x;
+                break;
+            case "m_y":
+                return_property = this.m_y;
+                break;
+            default:
+                return null;
+        }
+        return return_property;
+    }
 }
