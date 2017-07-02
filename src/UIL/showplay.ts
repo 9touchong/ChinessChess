@@ -66,7 +66,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         }
         this.active_faction = this.logic.active_faction;
         this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
-        this.addEventListener(CheActEvt.Act,this.do_Action,this,false,100);
+        this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
     private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
         if (evt._undo){ //悔棋按钮

@@ -35,7 +35,7 @@ class LogicPlay extends egret.DisplayObject{
         }
         if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
             //this.ai_act();
-            setTimeout(() => {this.ai_act();},1000);
+            setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
         }
     }
     private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
@@ -191,10 +191,10 @@ class LogicPlay extends egret.DisplayObject{
         }
         this.showplay.dispatchEvent(CheAct_Event);
         if (whether_change_faction){
-            this.change_faction();  //记 现在的问题就是这里的运算时间为什么会影响上面的发送事件。
+            this.change_faction();
         }
     }
-    private ai_act(){   //AI
+    private ai_act(){   //AI 注意运行时间比较长
         console.log("AI start!!");
         let move_order = this.AI.oneAImove();
         if (!move_order){
@@ -206,11 +206,5 @@ class LogicPlay extends egret.DisplayObject{
         CheInp_Event._moveToX = move_order.newX;
         CheInp_Event._moveToY = move_order.newY;
         this.reply_showplay(CheInp_Event);
-    }
-    private test(){
-        let t = 0;
-        for (let i = 0; i<9999999999; i++){
-            t= i;
-        }
     }
 }

@@ -51,8 +51,7 @@ class Piece extends egret.Bitmap {
 		let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
 		CheInput_Event._pieceID = this.p_id;
 		CheInput_Event._faction = this.p_faction;
-		this.parent.dispatchEvent(CheInput_Event)
-		//setTimeout(() => {this.test();},3000);
+		this.parent.dispatchEvent(CheInput_Event);
 	}
 	public picking_up(){	//被拿起的显示效果
 		console.log("piece picking_up");
@@ -64,11 +63,4 @@ class Piece extends egret.Bitmap {
 		this.scaleX = 1;
 		this.scaleY = 1;
 	}
-	public test(){
-        let t = 0;
-        for (let i = 0; i<9999999999; i++){
-            t= i;
-        };
-		console.log(t);
-    }
 }
