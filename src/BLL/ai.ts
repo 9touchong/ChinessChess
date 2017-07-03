@@ -220,7 +220,17 @@ class AI{
         };
         return {"value":A};
     }
-    public oneAImove(){
-        return this.getAlphaBeta(-99999,99999,this.treeDepth,this.arr2clone(this.Map),this.AI_faction);
+    public oneAImove(depth?,map?,faction?){
+        if (!depth){
+            depth = this.treeDepth;
+        }
+        if (!map){
+            map = this.Map;
+        }
+        if (!faction){
+            faction = this.AI_faction
+        }
+        //return this.getAlphaBeta(-99999,99999,this.treeDepth,this.arr2clone(this.Map),this.AI_faction);
+        return this.getAlphaBeta(-99999,99999,depth,this.arr2clone(map),faction);
     }
 }

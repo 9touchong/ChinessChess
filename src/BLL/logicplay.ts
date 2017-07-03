@@ -17,6 +17,7 @@ class LogicPlay extends egret.DisplayObject{
     private human_faction: string;    //玩家控制方 r或b
     private _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
+    private phas_var: Object;   //一些在运行过程中个别游戏功能需要的全局的变量，因为这些变量多而杂，且非用于主体程序，而且之后版本有更改的可能，放在一个{}里了
     private AI;
     public constructor(the_showplay?){
         super();
@@ -35,7 +36,7 @@ class LogicPlay extends egret.DisplayObject{
         }
         if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
             //this.ai_act();
-            setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
+            //setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
         }
     }
     private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
@@ -90,6 +91,8 @@ class LogicPlay extends egret.DisplayObject{
         };
         let AI_faction = (this.human_faction == "r") ? "b" : "r";
         this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        this.phas_var = {};
+        this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
@@ -143,6 +146,30 @@ class LogicPlay extends egret.DisplayObject{
                         t_record.FromY = t_piece.get_property("m_y");
                         this.HistoryList.push(t_record);
 
+                        //是否磨棋检查
+                        this.phas_var["just_move_steps"] += 1;
+                        if (this.phas_var["just_move_steps"] >8 ){
+                            let l = this.HistoryList.length - 1;
+                            if (this.compare_records(this.HistoryList[l],this.HistoryList[l-4]) && this.compare_records(this.HistoryList[l],this.HistoryList[l-8])){
+                                if (this.compare_records(this.HistoryList[l-1],this.HistoryList[l-5]) && this.compare_records(this.HistoryList[l-2],this.HistoryList[l-6]) && this.compare_records(this.HistoryList[l-3],this.HistoryList[l-7])){
+                                    //可以确定有磨棋行为
+                                    console.log("可以确定有磨棋行为");
+                                    //判断是要和棋还是先磨棋的一方输 要注意现在写进了历史纪录的这一步操作还没有在逻辑map中更新执行 要利用AI
+                                    let move_order = this.AI.oneAImove(2,this.Map,this.active_faction);
+                                    if (!move_order){
+                                        //和棋
+                                        console.log("磨棋是因为无棋可走，和棋");
+                                    }else if (t_record.MovePieceId == move_order.move_id && evt._moveToX == move_order.newX && evt._moveToY == move_order.newY){
+                                        //和棋
+                                        console.log("磨棋是因为除此无棋可走，和棋");
+                                    }else{
+                                        //先磨棋的一方输
+                                        console.log(this.active_faction,"方磨棋违规，判负")
+                                    }
+                                }
+                            }
+                        };
+
                         this.Map[t_record.FromX][t_record.FromY] = null;
                         t_piece.move(evt._moveToX,evt._moveToY);
                         this.Map[evt._moveToX][evt._moveToY] = t_record.MovePieceId;
@@ -166,6 +193,7 @@ class LogicPlay extends egret.DisplayObject{
                             t_record.FromY = t_piece.get_property("m_y");
                             t_record.DiePieceId = t_dying_p.get_property("p_id");
                             this.HistoryList.push(t_record);
+                            this.phas_var["just_move_steps"] = 0;
                             
                             this.Map[t_record.FromX][t_record.FromY] = null;
                             t_piece.move(evt._moveToX,evt._moveToY);
@@ -206,5 +234,15 @@ class LogicPlay extends egret.DisplayObject{
         CheInp_Event._moveToX = move_order.newX;
         CheInp_Event._moveToY = move_order.newY;
         this.reply_showplay(CheInp_Event);
+    }
+    private compare_records(r1,r2){
+        /**
+         * 比较两个操作记录是否一样
+         * 不必所有项都比较遍了
+         */
+        if (r1.MovePieceId == r2.MovePieceId && r1.FromX == r2.FromX && r1.FromY == r2.FromY){
+            return true;
+        }
+        return false;
     }
 }
