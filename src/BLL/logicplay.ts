@@ -153,18 +153,22 @@ class LogicPlay extends egret.DisplayObject{
                             if (this.compare_records(this.HistoryList[l],this.HistoryList[l-4]) && this.compare_records(this.HistoryList[l],this.HistoryList[l-8])){
                                 if (this.compare_records(this.HistoryList[l-1],this.HistoryList[l-5]) && this.compare_records(this.HistoryList[l-2],this.HistoryList[l-6]) && this.compare_records(this.HistoryList[l-3],this.HistoryList[l-7])){
                                     //可以确定有磨棋行为
-                                    console.log("可以确定有磨棋行为");
+                                    console.log("发现有磨棋行为");
+                                    CheAct_Event._gameover = true;
                                     //判断是要和棋还是先磨棋的一方输 要注意现在写进了历史纪录的这一步操作还没有在逻辑map中更新执行 要利用AI
                                     let move_order = this.AI.oneAImove(2,this.Map,this.active_faction);
                                     if (!move_order){
                                         //和棋
                                         console.log("磨棋是因为无棋可走，和棋");
+                                        CheAct_Event._winner ="no";
                                     }else if (t_record.MovePieceId == move_order.move_id && evt._moveToX == move_order.newX && evt._moveToY == move_order.newY){
                                         //和棋
                                         console.log("磨棋是因为除此无棋可走，和棋");
+                                        CheAct_Event._winner ="no";
                                     }else{
                                         //先磨棋的一方输
                                         console.log(this.active_faction,"方磨棋违规，判负")
+                                        CheAct_Event._winner = (this.active_faction == "r") ? "b" : "r";
                                     }
                                 }
                             }

@@ -203,13 +203,14 @@ class ShowPlay extends egret.DisplayObjectContainer{
         game_over_label.x = this.stage.width/2;
         game_over_label.y = this.stage.height/2;
         game_over_label.fontFamily = "KaiTi";
-        let str_winner: string;
         if (winner == "r"){
-            str_winner = "红方";
+            game_over_label.text = "红方获胜！";
+        }else if(winner == "b"){
+            game_over_label.text = "黑方获胜！";
         }else{
-            str_winner = "黑方";
+            game_over_label.text = "平局！！";
         }
-        game_over_label.text = str_winner+"获胜！";
+        
         //显示再来一局
         let reset_game_label:egret.TextField = new egret.TextField();
         this.addChild(reset_game_label);
