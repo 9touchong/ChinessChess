@@ -1,0 +1,9 @@
+{
+    "useClip": true,
+    "maxImageWidth": 1024,
+    "maxImageHeight": 1024,
+    "defaultResPath": "d:\\9touchong\\egret_WorkP\\ChinessChess\\resource\\default.res.json",
+    "packGroups": {
+        "preload": true
+    }
+}

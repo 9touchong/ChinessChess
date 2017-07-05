@@ -36,7 +36,7 @@ class LogicPlay extends egret.DisplayObject{
         }
         if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
             //this.ai_act();
-            //setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
+            setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
         }
     }
     private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
