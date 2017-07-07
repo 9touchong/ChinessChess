@@ -19,6 +19,7 @@ class LogicPlay extends egret.DisplayObject{
     private HistoryList: history_record[];   //历史纪录列表
     private phas_var: Object;   //一些在运行过程中个别游戏功能需要的全局的变量，因为这些变量多而杂，且非用于主体程序，而且之后版本有更改的可能，放在一个{}里了
     private AI;
+    private WS: egret.WebSocket; //与服务器的websocket连接，现在版本就是C/S模式，必须与服务器保持连接
     public constructor(the_showplay?){
         super();
         if (the_showplay){
@@ -28,37 +29,7 @@ class LogicPlay extends egret.DisplayObject{
     public bind(the_showplay){  //绑定显示层
         this.showplay = the_showplay;
     }
-    private change_faction(t_faction?:string){  //切换当前控制阵营
-        if (t_faction){
-            this.active_faction = t_faction;
-        }else{
-            (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
-        }
-        if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
-            //this.ai_act();
-            setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
-        }
-    }
-    private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
-        let t_record = this.HistoryList.pop();
-        if (!t_record){
-            return 0;
-        }
-        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
-        CheAct_Event._actPieceid = t_record.MovePieceId;
-        CheAct_Event._moveToX = t_record.FromX;
-        CheAct_Event._moveToY = t_record.FromY;
-        let t_act_piece = this.pieces_set[t_record.MovePieceId];
-        this.Map[t_act_piece.m_x][t_act_piece.m_y] = null;
-        t_act_piece.move(t_record.FromX,t_record.FromY);
-        this.Map[t_record.FromX][t_record.FromY] = t_record.MovePieceId;
-        if (t_record.DiePieceId){
-            let t_re_piece = this.pieces_set[t_record.DiePieceId];
-            t_re_piece.revive_self();
-            CheAct_Event._revivePieceid = t_record.DiePieceId;
-        }
-        this.showplay.dispatchEvent(CheAct_Event);
-    }
+    
     public startone(){
         /**
          * 开一局
@@ -94,6 +65,44 @@ class LogicPlay extends egret.DisplayObject{
         this.phas_var = {};
         this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
+
+        //ws连接服务器
+        //this.WS = new WebSocket("ws://192.168.1.102:2357/forChinessChess");
+        //this.WS = new egret.WebSocket();
+        //this.WS.type = egret.WebSocket.TYPE_BINARY;
+        //this.WS.connectByUrl("ws://192.168.1.102:2357/forChinessChess");
+        
+    }
+    private change_faction(t_faction?:string){  //切换当前控制阵营
+        if (t_faction){
+            this.active_faction = t_faction;
+        }else{
+            (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
+        }
+        if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
+            //this.ai_act();
+            setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
+        }
+    }
+    private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
+        let t_record = this.HistoryList.pop();
+        if (!t_record){
+            return 0;
+        }
+        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+        CheAct_Event._actPieceid = t_record.MovePieceId;
+        CheAct_Event._moveToX = t_record.FromX;
+        CheAct_Event._moveToY = t_record.FromY;
+        let t_act_piece = this.pieces_set[t_record.MovePieceId];
+        this.Map[t_act_piece.m_x][t_act_piece.m_y] = null;
+        t_act_piece.move(t_record.FromX,t_record.FromY);
+        this.Map[t_record.FromX][t_record.FromY] = t_record.MovePieceId;
+        if (t_record.DiePieceId){
+            let t_re_piece = this.pieces_set[t_record.DiePieceId];
+            t_re_piece.revive_self();
+            CheAct_Event._revivePieceid = t_record.DiePieceId;
+        }
+        this.showplay.dispatchEvent(CheAct_Event);
     }
     private reply_showplay(evt:CheInpEvt){   //处理并回应showplay的请求
         let whether_change_faction: boolean = false;    //标记是否换边，但不能当时马上换，要在把返回给表现层的消息发出之后再执行
