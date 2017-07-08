@@ -15,10 +15,12 @@ class LogicPlay extends egret.DisplayObject{
     private pieces_set: Object;   //所有棋子的集合
     private active_faction: string;  //当前应该行动的阵营,r或b
     private human_faction: string;    //玩家控制方 r或b
+    private your_faction: string;   //C/S模式下，你的阵营 r或b
     private _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
     private phas_var: Object;   //一些在运行过程中个别游戏功能需要的全局的变量，因为这些变量多而杂，且非用于主体程序，而且之后版本有更改的可能，放在一个{}里了
     private AI;
+    private CS_mode: boolean;   //是否是C/S模式 即联机对战
     private WS: egret.WebSocket; //与服务器的websocket连接，现在版本就是C/S模式，必须与服务器保持连接
     public constructor(the_showplay?){
         super();
@@ -66,12 +68,17 @@ class LogicPlay extends egret.DisplayObject{
         this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
 
-        //ws连接服务器
-        //this.WS = new WebSocket("ws://192.168.1.102:2357/forChinessChess");
-        //this.WS = new egret.WebSocket();
-        //this.WS.type = egret.WebSocket.TYPE_BINARY;
-        //this.WS.connectByUrl("ws://192.168.1.102:2357/forChinessChess");
-        
+        /*C/S模式的ws连接即处理函数等*/
+        this.CS_mode = true;
+        this.WS = new egret.WebSocket();
+        this.WS.addEventListener(egret.Event.CONNECT,function(){
+            console.log("logicplay 与ws服务器取得了连接");
+        },this);//连接服务器侦听
+        this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS,this);//服务器消息侦听
+        this.WS.addEventListener(egret.Event.CLOSE,function(){
+            console.log("logicplay 与ws服务器连接断开了");
+        },this);//ws连接断开侦听
+        this.WS.connectByUrl("ws://192.168.1.102:2357/forChinessChess");  
     }
     private change_faction(t_faction?:string){  //切换当前控制阵营
         if (t_faction){
@@ -257,5 +264,8 @@ class LogicPlay extends egret.DisplayObject{
             return true;
         }
         return false;
+    }
+    private reply_WS(msg:any){  //C/S模式下处理并回应ws服务器推送过来的消息 事实上此模式下一切实质性的行为都由服务器告诉的驱动
+        console.log("收到ws服务器的消息",msg);
     }
 }
