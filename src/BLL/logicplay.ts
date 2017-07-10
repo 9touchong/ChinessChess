@@ -65,20 +65,23 @@ class LogicPlay extends egret.DisplayObject{
         let AI_faction = (this.human_faction == "r") ? "b" : "r";
         this.AI = new AI(this.Map,this.pieces_set,AI_faction);
         this.phas_var = {};
-        this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数
+        this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数,判断是否磨棋时有用
         this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
 
         /*C/S模式的ws连接即处理函数等*/
         this.CS_mode = true;
         this.WS = new egret.WebSocket();
-        this.WS.addEventListener(egret.Event.CONNECT,function(){
+        this.WS.addEventListener(egret.Event.CONNECT,function(evt:egret.Event){
             console.log("logicplay 与ws服务器取得了连接");
+            let send_d = {"info":"haha"};
+            this.WS.writeUTF(JSON.stringify(send_d));
+            //this.WS.flush();
         },this);//连接服务器侦听
         this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS,this);//服务器消息侦听
-        this.WS.addEventListener(egret.Event.CLOSE,function(){
+        this.WS.addEventListener(egret.Event.CLOSE,function(evt:egret.Event){
             console.log("logicplay 与ws服务器连接断开了");
         },this);//ws连接断开侦听
-        this.WS.connectByUrl("ws://192.168.1.102:2357/forChinessChess");  
+        this.WS.connectByUrl("ws://192.168.1.102:2357/forChinessChess");
     }
     private change_faction(t_faction?:string){  //切换当前控制阵营
         if (t_faction){
@@ -120,6 +123,16 @@ class LogicPlay extends egret.DisplayObject{
             CheAct_Event._reset = true;
             this.showplay.dispatchEvent(CheAct_Event);
             return 0;
+        }
+        if (evt._giveup){
+            console.log("逻辑层收到了认输的请求");
+            //this._gameover = true;
+            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+            CheAct_Event._gameover = true;
+            CheAct_Event._winner = (this.active_faction == "r") ? "b" : "r";    //简化处理，其实本地对战或本地AI对战时，谁什么时候按投降时没有限制的
+            this.showplay.dispatchEvent(CheAct_Event);
+            return 0;
+
         }
         if (evt._undo){
             console.log("逻辑层收到了悔棋的请求");
@@ -265,7 +278,9 @@ class LogicPlay extends egret.DisplayObject{
         }
         return false;
     }
-    private reply_WS(msg:any){  //C/S模式下处理并回应ws服务器推送过来的消息 事实上此模式下一切实质性的行为都由服务器告诉的驱动
-        console.log("收到ws服务器的消息",msg);
+    private reply_WS(evt:egret.ProgressEvent){  //C/S模式下处理并回应ws服务器推送过来的消息 事实上此模式下一切实质性的行为都由服务器告诉的驱动
+        let msg:string = this.WS.readUTF();
+        let d_msg  = JSON.parse(msg);
+        console.log("收到ws服务器的消息",d_msg);
     }
 }

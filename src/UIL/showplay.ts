@@ -49,6 +49,11 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.addChild(undo_btn);
         undo_btn.x = board.x + board.width/2;
         undo_btn.y = board.y + board.height/2 - 100;
+        //认输按钮
+        var giveup_btn = new Giveup_Button();
+        this.addChild(giveup_btn);
+        giveup_btn.x = board.x + board.width/2;
+        giveup_btn.y = board.y + board.height/2 - 200;
         //初始化棋子及摆放
         this.pieces_set = {};
         var initMap = this.logic.initMap;
@@ -69,7 +74,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
     private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
-        if (evt._undo){ //悔棋按钮
+        if (evt._undo || evt._giveup){ //悔棋按钮
             this.logic.dispatchEvent(evt);
         }else if (evt._pieceID && evt._faction){  //棋子发来的
             if (evt._faction == this.active_faction){   //点击“己方”棋子
@@ -116,7 +121,8 @@ class ShowPlay extends egret.DisplayObjectContainer{
             this.startone();
             return 0;
         }
-        if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
+        //if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
+        if (evt._invalid){  //没有_actPieceid的判断弊大于利，不进行判断了 出现!evt._actPieceid 而又有其他移动的操作的情况本就是bug，不能用!evt._actPieceid掩盖
             this.calm_down();
             return 0;
         };
@@ -138,6 +144,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
             this.pieces_set[evt._revivePieceid].revive_self();
         }
         if (evt._gameover){
+            console.log("逻辑层让gameover");
             this.game_over(evt._winner);
         }
     }
