@@ -307,7 +307,11 @@ class LogicPlay extends egret.DisplayObject{
     private move_piece(act_id: string,toX: number,toY: number,dying_id?: number,do_history?: boolean,do_ActEvt?: boolean){
         /**
          * 走棋动作，因为这一套动作或代码会出现多次，所以将其成块分离出来，为简洁代码
-         * act_id，toX，toY：走棋必须三元素
+         * 只是处理走一步棋的map，logicpiece等的变化，不进行计算，诸如是否吃子都不在这里算
+         * act_id，toX，toY：走棋必须的棋子id，目的xy
+         * dying_id 被吃的子
+         * do_history 是否写进历史表，本地模式一般为是，网络对战一般为否
+         * do_ActEvt 是否直接给表现层发动作事件
          */
     }
     private ai_act(){   //AI 注意运行时间比较长
