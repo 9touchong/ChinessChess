@@ -17,4 +17,6 @@
     _invalid
     _winner
     _reset
+    your_faction    //允许加入游戏 返回分配给你的身份
 }
+网络化改编的同时不能影响原来本地AI对战的任何本地功能。

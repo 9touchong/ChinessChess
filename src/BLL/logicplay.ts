@@ -14,8 +14,7 @@ class LogicPlay extends egret.DisplayObject{
     private Map;    //和initmap不是一样的，Map的元素是可唯一代表LogicPiece对象的id
     private pieces_set: Object;   //所有棋子的集合
     private active_faction: string;  //当前应该行动的阵营,r或b
-    private human_faction: string;    //玩家控制方 r或b
-    private your_faction: string;   //C/S模式下，你的阵营 r或b
+    private human_faction: string;    //玩家控制方,己方 r或b 不论哪种模式下
     private _gameover: boolean;   //标志此局游戏是否已结束
     private HistoryList: history_record[];   //历史纪录列表
     private phas_var: Object;   //一些在运行过程中个别游戏功能需要的全局的变量，因为这些变量多而杂，且非用于主体程序，而且之后版本有更改的可能，放在一个{}里了
@@ -41,11 +40,20 @@ class LogicPlay extends egret.DisplayObject{
             console.log("logic与show必须互相绑定");
             return 0;
         }
+        //this.open_CS();
+        this.setInitChess();     
+    }
+    private setInitChess(your_faction: string = "r"){
+        /**
+         * 初始化棋局，包括摆棋等,每局游戏正式开始前的必须准备工作
+         */
         this.Map = new Array();
-        this.pieces_set = {};
-        this.HistoryList = new Array();
-        this.human_faction = "r";
-        this.change_faction("r");
+        this.pieces_set = {}; 
+        if (!this.CS_mode){
+            this.HistoryList = new Array(); //现在版本本地模式需要，网络对战就不需要本地历史纪录了，以后若要优化强化AI可能AI还要更依赖历史纪录，而网络对战弱有挂机托管功能还是要依赖ai的
+        };
+        this.human_faction = your_faction;
+        this.change_faction(your_faction);
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < this.initMap.length ; t_i++){
             this.Map[t_i] = new Array();
@@ -62,22 +70,29 @@ class LogicPlay extends egret.DisplayObject{
                 }  
             }
         };
-        let AI_faction = (this.human_faction == "r") ? "b" : "r";
-        this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        if (!this.CS_mode){
+            let AI_faction = (this.human_faction == "r") ? "b" : "r";
+            this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        };
         this.phas_var = {};
         this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数,判断是否磨棋时有用
-        this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
-
+        if (!this.CS_mode){
+            this.addEventListener(CheInpEvt.Tap,this.reply_showplay,this);
+        }else{
+            this.addEventListener(CheInpEvt.Tap,this.reply_showplay_toCS,this);
+        }
+    }
+    private open_CS(){
         /*C/S模式的ws连接即处理函数等*/
         this.CS_mode = true;
         this.WS = new egret.WebSocket();
         this.WS.addEventListener(egret.Event.CONNECT,function(evt:egret.Event){
             console.log("logicplay 与ws服务器取得了连接");
-            let send_d = {"info":"haha"};
+            let send_d = {"join":true}; //请求加入游戏
             this.WS.writeUTF(JSON.stringify(send_d));
-            //this.WS.flush();
+            this.WS.flush();
         },this);//连接服务器侦听
-        this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS,this);//服务器消息侦听
+        this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS_toshow,this);//服务器消息侦听
         this.WS.addEventListener(egret.Event.CLOSE,function(evt:egret.Event){
             console.log("logicplay 与ws服务器连接断开了");
         },this);//ws连接断开侦听
@@ -88,11 +103,13 @@ class LogicPlay extends egret.DisplayObject{
             this.active_faction = t_faction;
         }else{
             (this.active_faction == "r") ? this.active_faction = "b" : this.active_faction = "r";
-        }
-        if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
+        };
+        if (!this.CS_mode){ //本地对战电脑时 控制权传给ai
+            if (this.active_faction != this.human_faction){ //轮到非人类玩家方，AI行动
             //this.ai_act();
             setTimeout(() => {this.ai_act();},100); //这里要延时一下，因为ai的运算量挺大，难免会造成卡顿，就在ai运行前把己方走棋动画的时间容出来，这里定100，保险起见更大些较好
-        }
+            }
+        };
     }
     private undo(){ //悔棋，取游戏历史纪录中的最后一条，并按逆向规则修复逻辑层游戏状态并发命令给表现层
         let t_record = this.HistoryList.pop();
@@ -255,6 +272,44 @@ class LogicPlay extends egret.DisplayObject{
             this.change_faction();
         }
     }
+    private reply_showplay_toCS(evt:CheInpEvt){ //C/S模式下的reply_showplay
+        if (evt._giveup || evt._reset){
+            let send_d = {"_giveup":true};
+            this.WS.writeUTF(JSON.stringify(send_d));
+            this.WS.flush();
+            return 0;
+        }
+        if (evt._undo){
+            let send_d = {"_undo":true};
+            this.WS.writeUTF(JSON.stringify(send_d));
+            this.WS.flush();
+            return 0;
+        }
+        if (!evt._pieceID){ //除了悔棋重开等特殊情况理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
+            console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
+            return 0;
+        }
+        if (evt._moveToX!=null && evt._moveToY!=null){
+            let send_d = {"_pieceID":evt._pieceID,"_moveToX":evt._moveToX,"_moveToY":evt._moveToY};
+            this.WS.writeUTF(JSON.stringify(send_d));
+            this.WS.flush();
+            return 0;
+        }else{  //仅仅要求一个棋子的可移动范围等,不必麻烦服务器
+            let t_piece: LogicPiece = this.pieces_set[evt._pieceID];
+            t_piece.effect_update(this.Map,this.pieces_set);
+            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+            CheAct_Event._actPieceid = t_piece.get_property("p_id");
+            CheAct_Event._effectSites = t_piece.get_property("landing_points");
+            CheAct_Event._invalid = false;
+            this.showplay.dispatchEvent(CheAct_Event);
+        }
+    }
+    private move_piece(act_id: string,toX: number,toY: number,dying_id?: number,do_history?: boolean,do_ActEvt?: boolean){
+        /**
+         * 走棋动作，因为这一套动作或代码会出现多次，所以将其成块分离出来，为简洁代码
+         * act_id，toX，toY：走棋必须三元素
+         */
+    }
     private ai_act(){   //AI 注意运行时间比较长
         console.log("AI start!!");
         let move_order = this.AI.oneAImove();
@@ -278,9 +333,26 @@ class LogicPlay extends egret.DisplayObject{
         }
         return false;
     }
-    private reply_WS(evt:egret.ProgressEvent){  //C/S模式下处理并回应ws服务器推送过来的消息 事实上此模式下一切实质性的行为都由服务器告诉的驱动
+    private reply_WS_toshow(evt:egret.ProgressEvent){  //C/S模式下处理并回应ws服务器推送过来的消息转发行动命令给show 事实上此模式下一切实质性的行为都由服务器告诉的驱动
         let msg:string = this.WS.readUTF();
         let d_msg  = JSON.parse(msg);
         console.log("收到ws服务器的消息",d_msg);
+        if (d_msg.your_faction){   //被允许加入游戏 得到了分配给你的身份
+            this.setInitChess(d_msg.your_faction);
+            return 0;
+        };
+        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act); 
+        if (d_msg._invalid){
+            CheAct_Event._invalid = true;
+            this.showplay.dispatchEvent(CheAct_Event);
+            return 0;
+        }
+        if (d_msg._moveToX!=null && d_msg._moveToY!=null){  //移动棋子
+            if (!d_msg._actPieceid){
+                console.log("报错：接收到服务器传来无pieceid的移动命令，请修改代码");
+                return 0;
+            }
+        }
+        
     }
 }

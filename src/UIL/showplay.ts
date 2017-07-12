@@ -144,7 +144,6 @@ class ShowPlay extends egret.DisplayObjectContainer{
             this.pieces_set[evt._revivePieceid].revive_self();
         }
         if (evt._gameover){
-            console.log("逻辑层让gameover");
             this.game_over(evt._winner);
         }
     }
