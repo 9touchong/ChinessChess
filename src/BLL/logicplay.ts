@@ -92,7 +92,7 @@ class LogicPlay extends egret.DisplayObject{
             this.WS.writeUTF(JSON.stringify(send_d));
             this.WS.flush();
         },this);//连接服务器侦听
-        this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS_toshow,this);//服务器消息侦听
+        this.WS.addEventListener(egret.ProgressEvent.SOCKET_DATA,this.reply_WS_toShow,this);//服务器消息侦听
         this.WS.addEventListener(egret.Event.CLOSE,function(evt:egret.Event){
             console.log("logicplay 与ws服务器连接断开了");
         },this);//ws连接断开侦听
@@ -304,16 +304,7 @@ class LogicPlay extends egret.DisplayObject{
             this.showplay.dispatchEvent(CheAct_Event);
         }
     }
-    private move_piece(act_id: string,toX: number,toY: number,dying_id?: number,do_history?: boolean,do_ActEvt?: boolean){
-        /**
-         * 走棋动作，因为这一套动作或代码会出现多次，所以将其成块分离出来，为简洁代码
-         * 只是处理走一步棋的map，logicpiece等的变化，不进行计算，诸如是否吃子都不在这里算
-         * act_id，toX，toY：走棋必须的棋子id，目的xy
-         * dying_id 被吃的子
-         * do_history 是否写进历史表，本地模式一般为是，网络对战一般为否
-         * do_ActEvt 是否直接给表现层发动作事件
-         */
-    }
+    
     private ai_act(){   //AI 注意运行时间比较长
         console.log("AI start!!");
         let move_order = this.AI.oneAImove();
@@ -337,7 +328,7 @@ class LogicPlay extends egret.DisplayObject{
         }
         return false;
     }
-    private reply_WS_toshow(evt:egret.ProgressEvent){  //C/S模式下处理并回应ws服务器推送过来的消息转发行动命令给show 事实上此模式下一切实质性的行为都由服务器告诉的驱动
+    private reply_WS_toShow(evt:egret.ProgressEvent){  //C/S模式下处理并回应ws服务器推送过来的消息转发行动命令给show 事实上此模式下一切实质性的行为都由服务器告诉的驱动
         let msg:string = this.WS.readUTF();
         let d_msg  = JSON.parse(msg);
         console.log("收到ws服务器的消息",d_msg);
@@ -356,7 +347,37 @@ class LogicPlay extends egret.DisplayObject{
                 console.log("报错：接收到服务器传来无pieceid的移动命令，请修改代码");
                 return 0;
             }
+            let t_piece : LogicPiece  = this.pieces_set[d_msg._actPieceid];
+            let old_x = t_piece.get_property("m_x");
+            let old_y = t_piece.get_property("m_y");
+            this.Map[old_x][old_y] = null;
+            t_piece.move(d_msg._moveToX,d_msg._moveToY);
+            this.Map[d_msg._moveToX][d_msg._moveToY] = d_msg._actPieceid;
+
+            CheAct_Event._actPieceid = d_msg._actPieceid;
+            CheAct_Event._moveToX = d_msg._moveToX;
+            CheAct_Event._moveToY = d_msg._moveToY;
         }
-        
+        if (d_msg._dyingPieceid){   //吃子 注意这里就杀死被吃的子就行，不要注销其原map位置，因为吃他的子那里已经处理过了
+            let t_piece : LogicPiece  = this.pieces_set[d_msg._dyingPieceid];
+            t_piece.kill_self();
+            CheAct_Event._dyingPieceid = d_msg._dyingPieceid;
+        }
+        if (d_msg._revivePieceid){  //复活 同时要在map上为其复位
+            let t_piece : LogicPiece  = this.pieces_set[d_msg._revivePieceid];
+            t_piece.revive_self();
+            let re_x = t_piece.get_property("m_x");
+            let re_y = t_piece.get_property("m_y");
+            this.Map[re_x][re_y] = d_msg._revivePieceid;
+            CheAct_Event._revivePieceid = d_msg._revivePieceid;
+        }
+        if (d_msg._change_faction){
+            this.change_faction();
+            CheAct_Event._change_faction = true;
+        }
+        if (d_msg._winner){
+            CheAct_Event._gameover = true;
+            CheAct_Event._winner = d_msg._winner;
+        }
     }
 }
