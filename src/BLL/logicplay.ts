@@ -40,8 +40,8 @@ class LogicPlay extends egret.DisplayObject{
             console.log("logic与show必须互相绑定");
             return 0;
         }
-        //this.open_CS();
-        this.setInitChess();     
+        this.open_CS();
+        //this.setInitChess();     
     }
     private setInitChess(your_faction: string = "r"){
         /**
@@ -153,7 +153,7 @@ class LogicPlay extends egret.DisplayObject{
         }
         if (evt._undo){
             console.log("逻辑层收到了悔棋的请求");
-            this.undo(); this.undo();   //悔一合棋,也就是history中的后两个记录
+            this.undo(); this.undo();   //悔一合棋,也就是history中的后两个记录,虽然this.undo()内部没有更改act faction，因为是两步一回合，act faction 没变
             return 0;
         }
         if (!evt._pieceID){ //除了悔棋重开等特殊情况理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
@@ -163,6 +163,12 @@ class LogicPlay extends egret.DisplayObject{
         let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
         if (evt._moveToX!=null && evt._moveToY!=null){  //将要移动或吃子的请求
             let t_piece : LogicPiece  = this.pieces_set[evt._pieceID];
+            if (t_piece.get_property("p_faction") != this.active_faction){
+                console.log("逻辑层接收到来自表现层的非行动方行动请求，一定是bug，请检查");
+                CheAct_Event._invalid = true;
+                this.showplay.dispatchEvent(CheAct_Event);
+                return 0;
+            }
             CheAct_Event._actPieceid = evt._pieceID;
             CheAct_Event._invalid = true;   //这里先默认_invalid非法操作为true，因为毕竟除了达成移动或吃子的条件，其他情况的moveto请求都按非法操作处理
             t_piece.effect_update(this.Map,this.pieces_set);

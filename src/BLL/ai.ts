@@ -7,7 +7,7 @@ class AI{
     private pieces_set;
     private VALUE_set;  //子力表,记录或定义每个子在每个位置的价值
     private treeDepth: number;
-    public constructor(Map,pieces_set,AI_faction){
+    public constructor(Map,pieces_set,AI_faction:string = "b"){
         this.Map = Map;
         this.pieces_set = pieces_set;
         this.AI_faction = AI_faction;
