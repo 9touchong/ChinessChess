@@ -70,10 +70,8 @@ class LogicPlay extends egret.DisplayObject{
                 }  
             }
         };
-        if (!this.CS_mode){
-            let AI_faction = (this.human_faction == "r") ? "b" : "r";
-            this.AI = new AI(this.Map,this.pieces_set,AI_faction);
-        };
+        let AI_faction = (this.human_faction == "r") ? "b" : "r";
+        this.AI = new AI(this.Map,this.pieces_set,AI_faction);
         this.phas_var = {};
         this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数,判断是否磨棋时有用
         if (!this.CS_mode){
@@ -81,6 +79,7 @@ class LogicPlay extends egret.DisplayObject{
         }else{
             this.addEventListener(CheInpEvt.Tap,this.reply_showplay_toCS,this);
         }
+        console.log("客户端完成了自己的初始化",your_faction);
     }
     private open_CS(){
         /*C/S模式的ws连接即处理函数等*/
