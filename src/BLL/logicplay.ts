@@ -58,6 +58,9 @@ class LogicPlay extends egret.DisplayObject{
             case "initMap":
                 return_property = this.initMap;
                 break;
+            case "Map":
+                return_property = this.Map;
+                break;
             default:
                 return null;
         };
@@ -105,7 +108,7 @@ class LogicPlay extends egret.DisplayObject{
         }else{
             this.addEventListener(CheInpEvt.Tap,this.reply_showplay_toCS,this);
         }
-        this.adjust_show();
+        this.showplay.startone();
         console.log("客户端完成了自己的初始化",your_faction);
     }
     private adjust_show(){  //让显示层自行根据逻辑层矫正自己

@@ -120,6 +120,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
          * 完善中
          */
         this.human_faction = this.logic.get_property("human_faction");
+        this.active_faction = this.logic.get_property("active_faction");
     }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
         console.log("收到逻辑层的消息",evt);
