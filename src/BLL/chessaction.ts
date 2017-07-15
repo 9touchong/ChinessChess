@@ -16,6 +16,7 @@ class CheActEvt extends egret.Event{
     public _gameover:boolean = false;   //Game Over
     public _winner:string;  //r或b或no。当_gameover为true时这个属性才有用
     public _reset:boolean;  //重新游戏再来一局
+    public _adjust:boolean; //以逻辑层状态校准显示层
     public constructor(type:string, bubbles:boolean=false, cancelable:boolean=false){
         super(type,bubbles,cancelable);
     }

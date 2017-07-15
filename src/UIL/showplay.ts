@@ -25,7 +25,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
             return 0;
         }
         this.removeChildren();
-        this.human_faction = this.logic.human_faction;
+        this.human_faction = this.logic.get_property("human_faction");
         //棋盘和棋盘位点生成
         if (this.human_faction == "r"){
             var board = new ChessBoardBed(true);
@@ -56,7 +56,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
         giveup_btn.y = board.y + board.height/2 - 200;
         //初始化棋子及摆放
         this.pieces_set = {};
-        var initMap = this.logic.initMap;
+        var initMap = this.logic.get_property("initMap");
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < initMap.length ; t_i++){
             for (var t_j = 0 ; t_j < initMap[t_i].length ; t_j++){
@@ -69,7 +69,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                 }
             }
         }
-        this.active_faction = this.logic.active_faction;
+        this.active_faction = this.logic.get_property("active_faction");
         this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
         this.addEventListener(CheActEvt.Act,this.do_Action,this);
     }
@@ -114,8 +114,19 @@ class ShowPlay extends egret.DisplayObjectContainer{
             this.calm_down();
         }
     }
+    private adjustByLogic(){
+        /**
+         * 自行矫正与logic一致
+         * 完善中
+         */
+        this.human_faction = this.logic.get_property("human_faction");
+    }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
         console.log("收到逻辑层的消息",evt);
+        if (evt._adjust){
+            console.log("收到了逻辑层传来的矫正的命令");
+            this.adjustByLogic();
+        }
         if (evt._reset){
             console.log("收到了逻辑层传来的再来一局的命令");
             this.startone();

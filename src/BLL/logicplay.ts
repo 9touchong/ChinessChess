@@ -43,6 +43,26 @@ class LogicPlay extends egret.DisplayObject{
         this.open_CS();
         //this.setInitChess();     
     }
+    public get_property(property:string){
+        let return_property: any;
+        switch (property){
+            case "human_faction":
+                return_property = this.human_faction;
+                break;
+            case "active_faction":
+                return_property = this.active_faction;
+                break;
+            case "active_faction":
+                return_property = this.active_faction;
+                break;
+            case "initMap":
+                return_property = this.initMap;
+                break;
+            default:
+                return null;
+        };
+        return return_property;
+    }
     private setInitChess(your_faction: string = "r"){
         /**
          * 初始化棋局，包括摆棋等,每局游戏正式开始前的必须准备工作
@@ -70,8 +90,14 @@ class LogicPlay extends egret.DisplayObject{
                 }  
             }
         };
-        let AI_faction = (this.human_faction == "r") ? "b" : "r";
-        this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        if (!this.CS_mode){ //本地打电脑 ai代表对方
+            let AI_faction = (this.human_faction == "r") ? "b" : "r";
+            this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        }else{  //网络对战模式 当托管时用的上ai 代表自己
+            let AI_faction = this.human_faction
+            this.AI = new AI(this.Map,this.pieces_set,AI_faction);
+        }
+        
         this.phas_var = {};
         this.phas_var["just_move_steps"] = 0;   //连续没发生吃子的步数,判断是否磨棋时有用
         if (!this.CS_mode){
@@ -79,7 +105,13 @@ class LogicPlay extends egret.DisplayObject{
         }else{
             this.addEventListener(CheInpEvt.Tap,this.reply_showplay_toCS,this);
         }
+        this.adjust_show();
         console.log("客户端完成了自己的初始化",your_faction);
+    }
+    private adjust_show(){  //让显示层自行根据逻辑层矫正自己
+        let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+        CheAct_Event._adjust = true;
+        this.showplay.dispatchEvent(CheAct_Event);
     }
     private open_CS(){
         /*C/S模式的ws连接即处理函数等*/
