@@ -419,5 +419,6 @@ class LogicPlay extends egret.DisplayObject{
             CheAct_Event._gameover = true;
             CheAct_Event._winner = d_msg._winner;
         }
+        this.showplay.dispatchEvent(CheAct_Event);
     }
 }
