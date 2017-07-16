@@ -76,7 +76,7 @@ class LogicPlay extends egret.DisplayObject{
             this.HistoryList = new Array(); //现在版本本地模式需要，网络对战就不需要本地历史纪录了，以后若要优化强化AI可能AI还要更依赖历史纪录，而网络对战弱有挂机托管功能还是要依赖ai的
         };
         this.human_faction = your_faction;
-        this.change_faction(your_faction);
+        this.change_faction("r");   //红开 是国际惯例
         var tem_P_id_num:number = 0;
         for (var t_i  = 0 ; t_i < this.initMap.length ; t_i++){
             this.Map[t_i] = new Array();
@@ -328,21 +328,31 @@ class LogicPlay extends egret.DisplayObject{
         if (!evt._pieceID){ //除了悔棋重开等特殊情况理论上不应该出现没_pieceID的evt传到logic这里的，最多传到showplay里
             console.log("logicplay 接收到的CheInpEvt竟没有_pieceID",evt);
             return 0;
-        }
-        if (evt._moveToX!=null && evt._moveToY!=null){
-            let send_d = {"_pieceID":evt._pieceID,"_moveToX":evt._moveToX,"_moveToY":evt._moveToY};
-            this.WS.writeUTF(JSON.stringify(send_d));
-            this.WS.flush();
-            return 0;
-        }else{  //仅仅要求一个棋子的可移动范围等,不必麻烦服务器
+        }else{  //在这里判断点击的棋子是否是对面的或非行动回合，非法的不向服务器发送
             let t_piece: LogicPiece = this.pieces_set[evt._pieceID];
-            t_piece.effect_update(this.Map,this.pieces_set);
-            let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
-            CheAct_Event._actPieceid = t_piece.get_property("p_id");
-            CheAct_Event._effectSites = t_piece.get_property("landing_points");
-            CheAct_Event._invalid = false;
-            this.showplay.dispatchEvent(CheAct_Event);
-        }
+            if (this.active_faction == this.human_faction && this.active_faction == t_piece.get_property("p_faction")){
+                //合理合法的行动子
+            }else{//不合法 阻止
+                let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+                CheAct_Event._invalid = true;
+                this.showplay.dispatchEvent(CheAct_Event);
+                return 0
+            };
+            if (evt._moveToX!=null && evt._moveToY!=null){
+                let send_d = {"_pieceID":evt._pieceID,"_moveToX":evt._moveToX,"_moveToY":evt._moveToY};
+                this.WS.writeUTF(JSON.stringify(send_d));
+                this.WS.flush();
+            return 0;
+            }else{  //仅仅要求一个棋子的可移动范围等,不必麻烦服务器
+                //let t_piece: LogicPiece = this.pieces_set[evt._pieceID];
+                t_piece.effect_update(this.Map,this.pieces_set);
+                let CheAct_Event: CheActEvt = new CheActEvt(CheActEvt.Act);
+                CheAct_Event._actPieceid = t_piece.get_property("p_id");
+                CheAct_Event._effectSites = t_piece.get_property("landing_points");
+                CheAct_Event._invalid = false;
+                this.showplay.dispatchEvent(CheAct_Event);
+            }
+        }    
     }
     
     private ai_act(){   //AI 注意运行时间比较长

@@ -3,7 +3,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
     protected pieces_set: Object;   //所有棋子的集合
     protected sites_tab;    //所有位点的表
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
-    protected active_faction: string;  //当前应该行动的阵营,r或b
+    protected active_faction: string;  //当前应该行动的阵营,r或b 但表现层似乎不用这个也行 所有判断工作都交给逻辑层呢 
     protected shining_points_list;   //当前高亮显示的位点列表，用[m_x,m_y]表示
     protected human_faction: string;    //玩家控制方 r或b
     public constructor(the_logic?){
