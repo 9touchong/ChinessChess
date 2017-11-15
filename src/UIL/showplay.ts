@@ -1,32 +1,7 @@
 /**
  * 表现层主程
  */
-@RES.mapConfig("config.json", () => "resource", path => {
-    var ext = path.substr(path.lastIndexOf(".") + 1);
-    var type = "";
-    if (path.indexOf("3d") >= 0) {
-        type = "unit";
-    } else {
-        let typeMap = {
-            "jpg": "image",
-            "png": "image",
-            "webp": "image",
-            "json": "json",
-            "fnt": "font",
-            "pvr": "pvr",
-            "mp3": "sound"
-        }
-        type = typeMap[ext];
-        if (type == "json") {
-            if (path.indexOf("sheet") >= 0) {
-                type = "sheet";
-            } else if (path.indexOf("movieclip") >= 0) {
-                type = "movieclip";
-            };
-        }
-    }
-    return type;
-})
+
 class ShowPlay extends egret.DisplayObjectContainer {
     private logic;  //配套的逻辑系统
     private assets_ready:boolean;
@@ -39,12 +14,12 @@ class ShowPlay extends egret.DisplayObjectContainer {
     private context3d;
     private part2d:Scene2d;
     private part3d:Scene3d;
-    constructor(the_logic?) {
+    constructor(the_context3d,the_logic?) {
         super();
+        this.context3d = the_context3d;
         if (the_logic){
             this.bind(the_logic);
         }
-        utils.map();
     }
 
     public bind(the_logic){ //绑定逻辑层程序对象
@@ -57,12 +32,6 @@ class ShowPlay extends egret.DisplayObjectContainer {
             return 0;
         };
         this.removeChildren();
-        this.once(egret.Event.ADDED_TO_STAGE, async () => {
-            // 创建Egret3DCanvas，传入 2D stage，将开启混合模式
-            this.context3d = new egret3d.Egret3DCanvas(this.stage);
-            console.log("con3d",this.context3d);
-            egret.setRendererContext(this.context3d);
-            await this.loadAssets();
 
             this.human_faction = this.logic.get_property("human_faction");
 
@@ -75,7 +44,6 @@ class ShowPlay extends egret.DisplayObjectContainer {
             this.active_faction = this.logic.get_property("active_faction");
             this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
             this.addEventListener(CheActEvt.Act,this.do_Action,this);
-        },this);
         console.log("it is show's startone");
     }
     private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
@@ -223,98 +191,4 @@ class ShowPlay extends egret.DisplayObjectContainer {
         console.log("胜负已分");
         this.part2d.game_over(winner);
     }
-
-    private async loadAssets() {
-
-        async function load(resources: string[]) {
-            for (let r of resources) {
-                await RES.getResAsync(r);
-            }
-        }
-        try {
-            let loading = new LoadingUI();
-            this.stage.addChild(loading);
-            await RES.loadConfig();
-            let resources = [
-                "3d/chess/Model/chesspiece.esm",
-                "3d/background.jpg",
-                "3d/chess/Texture/B_che_D.png",
-				"3d/chess/Texture/B_che_N.png",
-				"3d/chess/Texture/B_che_S.png",
-				"3d/chess/Texture/B_jiang_D.png",
-				"3d/chess/Texture/B_jiang_N.png",
-				"3d/chess/Texture/B_jiang_S.png",
-				"3d/chess/Texture/B_ma_D.png",
-				"3d/chess/Texture/B_ma_N.png",
-				"3d/chess/Texture/B_ma_S.png",
-				"3d/chess/Texture/B_pao_D.png",
-				"3d/chess/Texture/B_pao_N.png",
-				"3d/chess/Texture/B_pao_S.png",
-				"3d/chess/Texture/B_shi_D.png",
-				"3d/chess/Texture/B_shi_N.png",
-				"3d/chess/Texture/B_shi_S.png",
-				"3d/chess/Texture/B_xiang_D.png",
-				"3d/chess/Texture/B_xiang_N.png",
-				"3d/chess/Texture/B_xiang_S.png",
-				"3d/chess/Texture/B_zu_D.png",
-				"3d/chess/Texture/B_zu_N.png",
-				"3d/chess/Texture/B_zu_S.png",
-				"3d/chess/Texture/chessboard.png",
-                "3d/chess/Texture/canputsite.png",
-				"3d/chess/Texture/piece_bodyD.png",
-				"3d/chess/Texture/R_bing_D.png",
-				"3d/chess/Texture/R_bing_N.png",
-				"3d/chess/Texture/R_bing_S.png",
-				"3d/chess/Texture/R_che_D.png",
-				"3d/chess/Texture/R_che_N.png",
-				"3d/chess/Texture/R_che_S.png",
-				"3d/chess/Texture/R_ma_D.png",
-				"3d/chess/Texture/R_ma_N.png",
-				"3d/chess/Texture/R_ma_S.png",
-				"3d/chess/Texture/R_pao_D.png",
-				"3d/chess/Texture/R_pao_N.png",
-				"3d/chess/Texture/R_pao_S.png",
-				"3d/chess/Texture/R_shi_D.png",
-				"3d/chess/Texture/R_shi_N.png",
-				"3d/chess/Texture/R_shi_S.png",
-				"3d/chess/Texture/R_shuai_D.png",
-				"3d/chess/Texture/R_shuai_N.png",
-				"3d/chess/Texture/R_shuai_S.png",
-				"3d/chess/Texture/R_xiang_D.png",
-				"3d/chess/Texture/R_xiang_N.png",
-				"3d/chess/Texture/R_xiang_S.png"
-            ];
-            await load(resources);
-            this.stage.removeChild(loading)
-        }
-        catch (e) {
-            alert(e.message)
-        }
-    }
-}
-
-namespace utils {
-
-    function promisify(loader: egret3d.UnitLoader, url: string) {
-        return new Promise((reslove, reject) => {
-            loader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, () => {
-                reslove(loader.data);
-            }, this);
-            loader.load("resource/" + url);
-        });
-    }
-
-    export function map() {
-
-        RES.processor.map("unit", {
-
-            onLoadStart: async (host, resource) => {
-                var loader = new egret3d.UnitLoader();
-                return promisify(loader, resource.url)
-            },
-
-            onRemoveStart: async (host, resource) => Promise.resolve()
-        });
-    }
-
 }

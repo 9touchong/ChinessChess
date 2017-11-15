@@ -10,14 +10,14 @@
 		"promise/bin/promise.js"
 	],
 	"game": [
+		"bin-debug/Main.js",
 		"bin-debug/BLL/ai.js",
-		"bin-debug/UIL/chessboard.js",
 		"bin-debug/BLL/chessaction.js",
 		"bin-debug/BLL/history.js",
 		"bin-debug/BLL/logicpiece.js",
 		"bin-debug/BLL/logicplay.js",
 		"bin-debug/UIL/CheInpEvt.js",
-		"bin-debug/Main.js",
+		"bin-debug/UIL/chessboard.js",
 		"bin-debug/UIL/chessboardsite.js",
 		"bin-debug/UIL/chesspiece.js",
 		"bin-debug/UIL/LoadingUI.js",
