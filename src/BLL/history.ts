@@ -6,5 +6,7 @@ class history_record{
     public MovePieceId : string;
     public FromX : number;
     public FromY : number;
+    //public ToX : number;
+    //public ToY : number;
     public DiePieceId : string;
 }

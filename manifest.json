@@ -1,0 +1,29 @@
+{
+	"initial": [
+		"libs/modules/egret/egret.js",
+		"libs/modules/egret/egret.web.js",
+		"libs/modules/game/game.js",
+		"libs/modules/tween/tween.js",
+		"libs/modules/egret3d/egret3d.js",
+		"libs/modules/socket/socket.js",
+		"resourcemanager/resourcemanager.js",
+		"promise/bin/promise.js"
+	],
+	"game": [
+		"bin-debug/BLL/ai.js",
+		"bin-debug/UIL/chessboard.js",
+		"bin-debug/BLL/chessaction.js",
+		"bin-debug/BLL/history.js",
+		"bin-debug/BLL/logicpiece.js",
+		"bin-debug/BLL/logicplay.js",
+		"bin-debug/UIL/CheInpEvt.js",
+		"bin-debug/Main.js",
+		"bin-debug/UIL/chessboardsite.js",
+		"bin-debug/UIL/chesspiece.js",
+		"bin-debug/UIL/LoadingUI.js",
+		"bin-debug/UIL/normalbtn.js",
+		"bin-debug/UIL/Scene2D.js",
+		"bin-debug/UIL/Scene3D.js",
+		"bin-debug/UIL/showplay.js"
+	]
+}

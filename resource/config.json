@@ -1,0 +1,75 @@
+{
+	"alias": {},
+	"groups": {},
+	"resources": {
+		"config.json": "config.json",
+		"3d": {
+			"background.jpg": "3d/background.jpg",
+			"0_Model": {
+				"MapConfig.json": "3d/0_Model/MapConfig.json",
+				"Eam": {
+					"attack.eam": "3d/0_Model/Eam/attack.eam",
+					"idle.eam": "3d/0_Model/Eam/idle.eam"
+				},
+				"Esm": {
+					"Zhouyu.esm": "3d/0_Model/Esm/Zhouyu.esm"
+				},
+				"Texture": {
+					"hero_01.png": "3d/0_Model/Texture/hero_01.png"
+				}
+			},
+			"chess":{
+				"Model":{
+					"chesspiece.esm":"3d/chess/Model/chesspiece.esm"
+				},
+				"Texture":{
+					"B_che_D.png":"3d/chess/Texture/B_che_D.png",
+					"B_che_N.png":"3d/chess/Texture/B_che_N.png",
+					"B_che_S.png":"3d/chess/Texture/B_che_S.png",
+					"B_jiang_D.png":"3d/chess/Texture/B_jiang_D.png",
+					"B_jiang_N.png":"3d/chess/Texture/B_jiang_N.png",
+					"B_jiang_S.png":"3d/chess/Texture/B_jiang_S.png",
+					"B_ma_D.png":"3d/chess/Texture/B_ma_D.png",
+					"B_ma_N.png":"3d/chess/Texture/B_ma_N.png",
+					"B_ma_S.png":"3d/chess/Texture/B_ma_S.png",
+					"B_pao_D.png":"3d/chess/Texture/B_pao_D.png",
+					"B_pao_N.png":"3d/chess/Texture/B_pao_N.png",
+					"B_pao_S.png":"3d/chess/Texture/B_pao_S.png",
+					"B_shi_D.png":"3d/chess/Texture/B_shi_D.png",
+					"B_shi_N.png":"3d/chess/Texture/B_shi_N.png",
+					"B_shi_S.png":"3d/chess/Texture/B_shi_S.png",
+					"B_xiang_D.png":"3d/chess/Texture/B_xiang_D.png",
+					"B_xiang_N.png":"3d/chess/Texture/B_xiang_N.png",
+					"B_xiang_S.png":"3d/chess/Texture/B_xiang_S.png",
+					"B_zu_D.png":"3d/chess/Texture/B_zu_D.png",
+					"B_zu_N.png":"3d/chess/Texture/B_zu_N.png",
+					"B_zu_S.png":"3d/chess/Texture/B_zu_S.png",
+					"chessboard.png":"3d/chess/Texture/chessboard.png",
+					"canputsite.png":"3d/chess/Texture/canputsite.png",
+					"piece_bodyD.png":"3d/chess/Texture/piece_bodyD.png",
+					"R_bing_D.png":"3d/chess/Texture/R_bing_D.png",
+					"R_bing_N.png":"3d/chess/Texture/R_bing_N.png",
+					"R_bing_S.png":"3d/chess/Texture/R_bing_S.png",
+					"R_che_D.png":"3d/chess/Texture/R_che_D.png",
+					"R_che_N.png":"3d/chess/Texture/R_che_N.png",
+					"R_che_S.png":"3d/chess/Texture/R_che_S.png",
+					"R_ma_D.png":"3d/chess/Texture/R_ma_D.png",
+					"R_ma_N.png":"3d/chess/Texture/R_ma_N.png",
+					"R_ma_S.png":"3d/chess/Texture/R_ma_S.png",
+					"R_pao_D.png":"3d/chess/Texture/R_pao_D.png",
+					"R_pao_N.png":"3d/chess/Texture/R_pao_N.png",
+					"R_pao_S.png":"3d/chess/Texture/R_pao_S.png",
+					"R_shi_D.png":"3d/chess/Texture/R_shi_D.png",
+					"R_shi_N.png":"3d/chess/Texture/R_shi_N.png",
+					"R_shi_S.png":"3d/chess/Texture/R_shi_S.png",
+					"R_shuai_D.png":"3d/chess/Texture/R_shuai_D.png",
+					"R_shuai_N.png":"3d/chess/Texture/R_shuai_N.png",
+					"R_shuai_S.png":"3d/chess/Texture/R_shuai_S.png",
+					"R_xiang_D.png":"3d/chess/Texture/R_xiang_D.png",
+					"R_xiang_N.png":"3d/chess/Texture/R_xiang_N.png",
+					"R_xiang_S.png":"3d/chess/Texture/R_xiang_S.png"
+				}
+			}
+		}
+	}
+}

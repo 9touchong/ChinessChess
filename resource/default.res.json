@@ -1,110 +1,25 @@
 {
 	"groups": [
 		{
-			"keys": "egret_icon_png,bg_jpg,b_box_png,b_c_png,b_j_png,b_m_png,b_p_png,b_s_png,b_x_png,b_z_png,dot_png,r_box_png,r_c_png,r_j_png,r_m_png,r_p_png,r_s_png,r_x_png,r_z_png,board_png",
-			"name": "preload"
+			"name": "preload",
+			"keys": "R_che_D_png,R_che_N_png,canputsite_png"
 		}
 	],
 	"resources": [
 		{
-			"name": "egret_icon_png",
+			"name": "R_che_D_png",
 			"type": "image",
-			"url": "assets/egret_icon.png"
+			"url": "3d/chess/Texture/R_che_D.png"
 		},
 		{
-			"name": "bg_jpg",
+			"name": "R_che_N_png",
 			"type": "image",
-			"url": "assets/stype_1/bg.jpg"
+			"url": "3d/chess/Texture/R_che_N.png"
 		},
 		{
-			"name": "b_box_png",
+			"name": "canputsite_png",
 			"type": "image",
-			"url": "assets/stype_1/b_box.png"
-		},
-		{
-			"name": "b_c_png",
-			"type": "image",
-			"url": "assets/stype_1/b_c.png"
-		},
-		{
-			"name": "b_j_png",
-			"type": "image",
-			"url": "assets/stype_1/b_j.png"
-		},
-		{
-			"name": "b_m_png",
-			"type": "image",
-			"url": "assets/stype_1/b_m.png"
-		},
-		{
-			"name": "b_p_png",
-			"type": "image",
-			"url": "assets/stype_1/b_p.png"
-		},
-		{
-			"name": "b_s_png",
-			"type": "image",
-			"url": "assets/stype_1/b_s.png"
-		},
-		{
-			"name": "b_x_png",
-			"type": "image",
-			"url": "assets/stype_1/b_x.png"
-		},
-		{
-			"name": "b_z_png",
-			"type": "image",
-			"url": "assets/stype_1/b_z.png"
-		},
-		{
-			"name": "dot_png",
-			"type": "image",
-			"url": "assets/stype_1/dot.png"
-		},
-		{
-			"name": "r_box_png",
-			"type": "image",
-			"url": "assets/stype_1/r_box.png"
-		},
-		{
-			"name": "r_c_png",
-			"type": "image",
-			"url": "assets/stype_1/r_c.png"
-		},
-		{
-			"name": "r_j_png",
-			"type": "image",
-			"url": "assets/stype_1/r_j.png"
-		},
-		{
-			"name": "r_m_png",
-			"type": "image",
-			"url": "assets/stype_1/r_m.png"
-		},
-		{
-			"name": "r_p_png",
-			"type": "image",
-			"url": "assets/stype_1/r_p.png"
-		},
-		{
-			"name": "r_s_png",
-			"type": "image",
-			"url": "assets/stype_1/r_s.png"
-		},
-		{
-			"name": "r_x_png",
-			"type": "image",
-			"url": "assets/stype_1/r_x.png"
-		},
-		{
-			"name": "r_z_png",
-			"type": "image",
-			"url": "assets/stype_1/r_z.png"
-		},
-		{
-			"name": "board_png",
-			"type": "image",
-			"url": "assets/stype_1/board.png"
+			"url": "3d/chess/Texture/canputsite.png"
 		}
 	]
 }

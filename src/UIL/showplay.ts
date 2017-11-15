@@ -1,76 +1,86 @@
-class ShowPlay extends egret.DisplayObjectContainer{
+/**
+ * 表现层主程
+ */
+@RES.mapConfig("config.json", () => "resource", path => {
+    var ext = path.substr(path.lastIndexOf(".") + 1);
+    var type = "";
+    if (path.indexOf("3d") >= 0) {
+        type = "unit";
+    } else {
+        let typeMap = {
+            "jpg": "image",
+            "png": "image",
+            "webp": "image",
+            "json": "json",
+            "fnt": "font",
+            "pvr": "pvr",
+            "mp3": "sound"
+        }
+        type = typeMap[ext];
+        if (type == "json") {
+            if (path.indexOf("sheet") >= 0) {
+                type = "sheet";
+            } else if (path.indexOf("movieclip") >= 0) {
+                type = "movieclip";
+            };
+        }
+    }
+    return type;
+})
+class ShowPlay extends egret.DisplayObjectContainer {
     private logic;  //配套的逻辑系统
+    private assets_ready:boolean;
     protected pieces_set: Object;   //所有棋子的集合
     protected sites_tab;    //所有位点的表
     protected active_pieceId: string;    //当前活跃棋子的id，即被拿起来的那个
-    protected active_faction: string;  //当前应该行动的阵营,r或b
+    protected active_faction: string;  //当前应该行动的阵营,r或b 但表现层似乎不用这个也行 所有判断工作都交给逻辑层呢 
     protected shining_points_list;   //当前高亮显示的位点列表，用[m_x,m_y]表示
     protected human_faction: string;    //玩家控制方 r或b
-    public constructor(the_logic?){
-        /**
-         *the_master 代表引入此类的对象的父容器，因这里用不了parent所以要这样
-         *the_logic 配套的逻辑程序
-         */
+    private context3d;
+    private part2d:Scene2d;
+    private part3d:Scene3d;
+    constructor(the_logic?) {
         super();
         if (the_logic){
             this.bind(the_logic);
-        }   
+        }
+        utils.map();
     }
+
     public bind(the_logic){ //绑定逻辑层程序对象
         this.logic = the_logic;
     }
-    public startone(){  //开一局
+
+    public startone(){
         if (!this.logic){
             console.log("logic与show必须互相绑定");
             return 0;
-        }
-        this.removeChildren();
-        this.human_faction = this.logic.human_faction;
-        //棋盘和棋盘位点生成
-        if (this.human_faction == "r"){
-            var board = new ChessBoardBed(true);
-        }else{
-            var board = new ChessBoardBed();
         };
-        this.addChild(board);
-        board.gene_sites_points();
-        this.sites_tab = new Array();
-        for (let t_i = 0 ; t_i < board.sites_points.length ; t_i++){
-            this.sites_tab[t_i] = new Array();
-            for (let t_j = 0 ; t_j < board.sites_points[t_i].length ; t_j++){
-                let t_point = board.sites_points[t_i][t_j];
-                let t_site = new ChessBoardSite(t_point[0],t_point[1],t_i,t_j);
-                this.addChild(t_site);
-                this.sites_tab[t_i][t_j] = t_site;
-            }
-        }
-        //悔棋按钮
-        var undo_btn = new Undo_Button();
-        this.addChild(undo_btn);
-        undo_btn.x = board.x + board.width/2;
-        undo_btn.y = board.y + board.height/2 - 100;
-        //初始化棋子及摆放
-        this.pieces_set = {};
-        var initMap = this.logic.initMap;
-        var tem_P_id_num:number = 0;
-        for (var t_i  = 0 ; t_i < initMap.length ; t_i++){
-            for (var t_j = 0 ; t_j < initMap[t_i].length ; t_j++){
-                if (initMap[t_i][t_j]){
-                    let t_piece = new Piece(initMap[t_i][t_j][0],initMap[t_i][t_j][1],board.sites_points[t_i][t_j][0],board.sites_points[t_i][t_j][1],t_i,t_j);
-                    t_piece.set_p_id("p_"+tem_P_id_num);
-                    this.addChild(t_piece);
-                    this.pieces_set["p_"+tem_P_id_num] = t_piece;
-                    tem_P_id_num += 1;
-                }
-            }
-        }
-        this.active_faction = this.logic.active_faction;
-        this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
-        this.addEventListener(CheActEvt.Act,this.do_Action,this);
+        this.removeChildren();
+        this.once(egret.Event.ADDED_TO_STAGE, async () => {
+            // 创建Egret3DCanvas，传入 2D stage，将开启混合模式
+            this.context3d = new egret3d.Egret3DCanvas(this.stage);
+            console.log("con3d",this.context3d);
+            egret.setRendererContext(this.context3d);
+            await this.loadAssets();
+
+            this.human_faction = this.logic.get_property("human_faction");
+
+            this.part3d = new Scene3d(this.context3d,this);
+            this.part3d.createGameScene();
+
+            this.part2d = new Scene2d(this);
+            this.addChild(this.part2d);
+
+            this.active_faction = this.logic.get_property("active_faction");
+            this.addEventListener(CheInpEvt.Tap,this.tra_CheInp,this);
+            this.addEventListener(CheActEvt.Act,this.do_Action,this);
+        },this);
+        console.log("it is show's startone");
     }
     private tra_CheInp(evt:CheInpEvt){  //处理棋盘棋子按钮等点击后的消息
-        if (evt._undo){ //悔棋按钮
-            this.logic.dispatchEvent(evt,true);
+        if (evt._undo || evt._giveup){ //悔棋按钮
+            this.logic.dispatchEvent(evt);
         }else if (evt._pieceID && evt._faction){  //棋子发来的
             if (evt._faction == this.active_faction){   //点击“己方”棋子
                 if (evt._pieceID == this.active_pieceId){   //点的是正被拿起的子
@@ -83,7 +93,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     };
                     this.active_pieceId = evt._pieceID;
                     this.pieces_set[this.active_pieceId].picking_up();
-                    this.logic.dispatchEvent(evt,true);  //将CheInpEvt转发给逻辑层
+                    this.logic.dispatchEvent(evt);  //将CheInpEvt转发给逻辑层
                 }
             }else{  //点击敌方棋子
                 if (this.active_pieceId){
@@ -92,7 +102,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
                     evt._moveToY = t_piece.m_y;
                     evt._pieceID = this.active_pieceId;
                     evt._faction = this.pieces_set[evt._pieceID].p_faction;
-                    this.logic.dispatchEvent(evt,true);
+                    this.logic.dispatchEvent(evt);
                 }
                 this.calm_down();
             }
@@ -101,7 +111,7 @@ class ShowPlay extends egret.DisplayObjectContainer{
             console.log("得到一个位点的点击消息");
             if (this.active_pieceId){   //如果没有棋子，单纯的位点没作用
                 evt._pieceID = this.active_pieceId;
-                this.logic.dispatchEvent(evt,true);
+                this.logic.dispatchEvent(evt);
             }
         }
         else{   //棋盘空白发来的
@@ -109,14 +119,28 @@ class ShowPlay extends egret.DisplayObjectContainer{
             this.calm_down();
         }
     }
+    private adjustByLogic(){
+        /**
+         * 自行矫正与logic一致
+         * 完善中
+         */
+        this.human_faction = this.logic.get_property("human_faction");
+        this.active_faction = this.logic.get_property("active_faction");
+    }
     private do_Action(evt:CheActEvt){   //处理逻辑层给的命令
+        console.log("收到逻辑层的消息",evt);
+        if (evt._adjust){
+            console.log("收到了逻辑层传来的矫正的命令");
+            //this.adjustByLogic();
+        }
         console.log("收到逻辑层的消息",new Date().getTime(),evt);
         if (evt._reset){
             console.log("收到了逻辑层传来的再来一局的命令");
             this.startone();
             return 0;
         }
-        if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
+        //if (!evt._actPieceid || evt._invalid){  //没有_actPieceid的肯定是不合法的,或得到操作错误的命令，要做的是把所有激活状态的元件放下
+        if (evt._invalid){  //没有_actPieceid的判断弊大于利，不进行判断了 出现!evt._actPieceid 而又有其他移动的操作的情况本就是bug，不能用!evt._actPieceid掩盖
             this.calm_down();
             return 0;
         };
@@ -188,48 +212,109 @@ class ShowPlay extends egret.DisplayObjectContainer{
     }
     private movepiece(pieceID: string , m_x: number , m_y: number){
         let t_site = this.sites_tab[m_x][m_y];
-        this.pieces_set[pieceID].move(m_x,m_y,t_site.x,t_site.y);
+        this.pieces_set[pieceID].move(m_x,m_y,t_site.body.x,t_site.body.z);
     }
-    private game_over(winner: string){  //游戏结束胜负已分的显示
+    public game_over(winner: string){
         if (!winner){   //理论上不会出现这种情况
             console.log("显示层收到逻辑层的gameover消息但没有winner");
-            this.calm_down();
+            //this.calm_down();
             return 0;
         };
         console.log("胜负已分");
-        //先蒙上一层幕布
-        let shape:egret.Shape = new egret.Shape();
-        shape.graphics.beginFill(0x888888);
-        shape.graphics.drawRect( 0, 0, this.stage.stageWidth, this.stage.stageHeight );
-        shape.graphics.endFill();
-        shape.alpha = 0.5;
-        shape.touchEnabled = true;
-        this.addChild( shape );
-        //显示游戏结束文字
-        let game_over_label:egret.TextField = new egret.TextField();
-        this.addChild( game_over_label );
-        game_over_label.x = this.stage.width/2;
-        game_over_label.y = this.stage.height/2;
-        game_over_label.fontFamily = "KaiTi";
-        let str_winner: string;
-        if (winner == "r"){
-            str_winner = "红方";
-        }else{
-            str_winner = "黑方";
-        }
-        game_over_label.text = str_winner+"获胜！";
-        //显示再来一局
-        let reset_game_label:egret.TextField = new egret.TextField();
-        this.addChild(reset_game_label);
-        reset_game_label.x = game_over_label.x;
-        reset_game_label.y = game_over_label.y + 100;
-        reset_game_label.text = "再来一局";
-        reset_game_label.touchEnabled = true;
-        reset_game_label.addEventListener(egret.TouchEvent.TOUCH_TAP,function(){
-            console.log("点击了再来一局",this);
-            let CheInput_Event : CheInpEvt = new CheInpEvt(CheInpEvt.Tap);
-            CheInput_Event._reset = true;
-            this.logic.dispatchEvent(CheInput_Event);
-        },this)
+        this.part2d.game_over(winner);
     }
+
+    private async loadAssets() {
+
+        async function load(resources: string[]) {
+            for (let r of resources) {
+                await RES.getResAsync(r);
+            }
+        }
+        try {
+            let loading = new LoadingUI();
+            this.stage.addChild(loading);
+            await RES.loadConfig();
+            let resources = [
+                "3d/chess/Model/chesspiece.esm",
+                "3d/background.jpg",
+                "3d/chess/Texture/B_che_D.png",
+				"3d/chess/Texture/B_che_N.png",
+				"3d/chess/Texture/B_che_S.png",
+				"3d/chess/Texture/B_jiang_D.png",
+				"3d/chess/Texture/B_jiang_N.png",
+				"3d/chess/Texture/B_jiang_S.png",
+				"3d/chess/Texture/B_ma_D.png",
+				"3d/chess/Texture/B_ma_N.png",
+				"3d/chess/Texture/B_ma_S.png",
+				"3d/chess/Texture/B_pao_D.png",
+				"3d/chess/Texture/B_pao_N.png",
+				"3d/chess/Texture/B_pao_S.png",
+				"3d/chess/Texture/B_shi_D.png",
+				"3d/chess/Texture/B_shi_N.png",
+				"3d/chess/Texture/B_shi_S.png",
+				"3d/chess/Texture/B_xiang_D.png",
+				"3d/chess/Texture/B_xiang_N.png",
+				"3d/chess/Texture/B_xiang_S.png",
+				"3d/chess/Texture/B_zu_D.png",
+				"3d/chess/Texture/B_zu_N.png",
+				"3d/chess/Texture/B_zu_S.png",
+				"3d/chess/Texture/chessboard.png",
+                "3d/chess/Texture/canputsite.png",
+				"3d/chess/Texture/piece_bodyD.png",
+				"3d/chess/Texture/R_bing_D.png",
+				"3d/chess/Texture/R_bing_N.png",
+				"3d/chess/Texture/R_bing_S.png",
+				"3d/chess/Texture/R_che_D.png",
+				"3d/chess/Texture/R_che_N.png",
+				"3d/chess/Texture/R_che_S.png",
+				"3d/chess/Texture/R_ma_D.png",
+				"3d/chess/Texture/R_ma_N.png",
+				"3d/chess/Texture/R_ma_S.png",
+				"3d/chess/Texture/R_pao_D.png",
+				"3d/chess/Texture/R_pao_N.png",
+				"3d/chess/Texture/R_pao_S.png",
+				"3d/chess/Texture/R_shi_D.png",
+				"3d/chess/Texture/R_shi_N.png",
+				"3d/chess/Texture/R_shi_S.png",
+				"3d/chess/Texture/R_shuai_D.png",
+				"3d/chess/Texture/R_shuai_N.png",
+				"3d/chess/Texture/R_shuai_S.png",
+				"3d/chess/Texture/R_xiang_D.png",
+				"3d/chess/Texture/R_xiang_N.png",
+				"3d/chess/Texture/R_xiang_S.png"
+            ];
+            await load(resources);
+            this.stage.removeChild(loading)
+        }
+        catch (e) {
+            alert(e.message)
+        }
+    }
+}
+
+namespace utils {
+
+    function promisify(loader: egret3d.UnitLoader, url: string) {
+        return new Promise((reslove, reject) => {
+            loader.addEventListener(egret3d.LoaderEvent3D.LOADER_COMPLETE, () => {
+                reslove(loader.data);
+            }, this);
+            loader.load("resource/" + url);
+        });
+    }
+
+    export function map() {
+
+        RES.processor.map("unit", {
+
+            onLoadStart: async (host, resource) => {
+                var loader = new egret3d.UnitLoader();
+                return promisify(loader, resource.url)
+            },
+
+            onRemoveStart: async (host, resource) => Promise.resolve()
+        });
+    }
+
 }
